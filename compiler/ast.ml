@@ -25,6 +25,7 @@ type fop = Open | Close											(* file operator *)
 
 type stmt =
 	| Block of stmt list
+	| Decl of string * string * expr
 	| Expr of expr
 	| Return of expr
 	| If of expr * stmt * stmt								(* if() {} else{} *)
