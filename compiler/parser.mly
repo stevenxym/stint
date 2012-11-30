@@ -51,11 +51,11 @@ var_type:
 		
 formals_opt:
 		/* nothing */ { [] }
-	| formal_list vdecl	{ List.rev $1 }
+	| formal_list { List.rev $1 }
 
 formal_list:
-	| var_type ID { [$1] }
-	| formal_list COMMA var_type { $3 :: $1}
+	| var_type ID { [($1, $2)] }
+	| formal_list COMMA var_type ID { ($3, $4) :: $1}
 
 vdecl:
 		var_type ID SEMI { ($1, $2) }
@@ -75,7 +75,6 @@ stmt:
 		| LBRACE stmt_list RBRACE { Block(List.rev $2) }
 		| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
 		| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }
-		| FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt { For($3, $5, $7, $9) }
 		| WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 		| BREAK SEMI { Break }
 		| OPEN expr SEMI { Fop(Open, $2) }
@@ -100,9 +99,16 @@ expr:
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
 		| expr { Extract($1, SubChar, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
-
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
+
+actuals_opt:
+    /* nothing */ { [] }
+  | actuals_list  { List.rev $1 }
+
+actuals_list:
+    expr                    { [$1] }
+  | actuals_list COMMA expr { $3 :: $1 }
 
 
 

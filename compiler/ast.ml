@@ -35,9 +35,10 @@ type stmt =
 	| Fop of fop * expr									(* open/close filename *)
 
 type func_decl = {
+		returnType :string;
 		fname : string;									(* function name *)
-		args : string list;								(* arguments passed in *)
-		local : string list								(* variables defined in function *)
+		formals : string list;							(* Formal argument names *)
+		(* local : string list								variables defined in function *)
 		body : stmt list;								(* function statements *)
 	}
 
