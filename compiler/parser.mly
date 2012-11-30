@@ -47,9 +47,9 @@ fdecl:
 		}
 		
 var_type:
-		INT { Int($1) }
-		| STR { String($1) }
-		| BOOL { Boolean($1) }
+		INT { Int("int") }
+		| STR { String("string") }
+		| BOOL { Boolean("boolean") }
 		
 formals_opt:
 		/* nothing */ { [] }
@@ -82,11 +82,15 @@ stmt:
 		| OPEN expr SEMI { Fop(Open, $2) }
 		| CLOSE expr SEMI { Fop(Close, $2) }
 
+stmt_list:
+		/*Nothing*/ { [] }
+		|stmt_list stmt {$2 :: $1}
+
 expr:
 		LIT_INT { Integer($1) }
-		LIT_STR { String($1) }
+		|LIT_STR { String($1) }
 		| ID { Id($1) }
-		| STD { Std($1) }
+		| STD { Std("std") }
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
 		| expr PLUS expr AT expr{ OperAt($1, Add, at, $5) }
@@ -101,14 +105,12 @@ expr:
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
 		| ID ASSIGN expr { Assign($1, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
-		| expr { Extract($1, SubChar, $3) }
-		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
 		| expr LPANGLE LIT_INT GRT { Extract($1, SubInt, $3) }
 		| expr LESS LIT_INT GRT { Extract($1, SubStr, $3) }
 		| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
-		| expr LETT LIT_INT GRT ASSIGN expr {}
-		| expr SEARCH expr { Chset($1, Fnd, $2) }
-		| expr SPLIT expr { Chset($1, Spl, $2) }
+		| expr LESS LIT_INT GRT ASSIGN expr {}
+		| expr SEARCH expr { Chset($1, Fnd, $3) }
+		| expr SPLIT expr { Chset($1, Spl, $3) }
 		| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) }
 		| RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
 		| CIN expr expr { Stream(In, $2, $3) }
