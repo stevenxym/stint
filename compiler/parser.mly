@@ -101,10 +101,8 @@ expr:
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
 		| ID ASSIGN expr { Assign($1, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
-<<<<<<< Updated upstream
 		| expr { Extract($1, SubChar, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
-=======
 		| expr LPANGLE LIT_INT GRT { Extract($1, SubInt, $3) }
 		| expr LESS LIT_INT GRT { Extract($1, SubStr, $3) }
 		| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
@@ -115,8 +113,6 @@ expr:
 		| RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
 		| CIN expr expr { Stream(In, $2, $3) }
 		| COUT expr expr { Stream(Out, $2, $3) }
-
->>>>>>> Stashed changes
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
 
