@@ -23,8 +23,8 @@ rule token = parse
 	| '#'										{ SEARCH }					|	'~'							{ RM }
 	| "&&"									{ AND }							| "||"						{ OR }
 	| '!'										{ NOT }							| "<<"						{ COUT }
-	| ">>"									{ CIN }							| "int"						{ INT }
-	| "string"							{ STR }							| "boolean"				{ BOOL }
+	| ">>"									{ CIN }							| "int"	as integer					{ INT(integer) }
+	| "string"							{ STR }							| "boolean"	as boolean			{ BOOL(boolean) }
 	| "if"									{ IF }							| "else"					{ ELSE }
 	| "while"								{ WHILE }						| "return"				{ RETURN }
 	| "open"								{ OPEN }						| "close"					{ CLOSE }

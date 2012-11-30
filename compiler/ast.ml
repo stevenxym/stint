@@ -7,6 +7,11 @@ type sets = Spl | Fnd									(* |, # *)
 type strm = In | Out									(* <<, >>*)
 type at
 
+type var_type = 
+	Int of string
+	|String of string
+	|Boolean of string
+
 type expr =
 	  Integer of int									(* data type: int *)
 	| String of string									(* data type: string *)

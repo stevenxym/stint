@@ -1,12 +1,10 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-			 LBRACK RBRACK LPANGLE LANGLE RANGLE												(* marks *)
-%token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			(* general operators *)
-%token AT SPLIT SEARCH RM NOT AND OR	COUT CIN										(* type-specified operators *)
-%token INT STR BOOL IF WHILE RETURN OPEN CLOSE BREAK EOF
-			 VOID TRUE FALSE STD																				(* key word *)
-%token END		(* don't know whether need it *)
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACK RBRACK LPANGLE LANGLE RANGLE		/* marks */
+%token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			  				/* general operators */
+%token AT SPLIT SEARCH RM NOT AND OR	COUT CIN										/* type-specified operators */
+%token INT STR BOOL IF WHILE RETURN OPEN CLOSE BREAK EOF VOID TRUE FALSE STD																				/* key word */
+%token END																				/* don't know whether need it */
 %token <int> LIT_INT
 %token <string> LIT_STR
 %token <string> ID
@@ -15,15 +13,15 @@
 %nonassoc ELSE
 %nonassoc AT
 %nonassoc NOAT
-%right ASSIGN COUT CIN					(* =, <<, >> *)
-%left EQ NEQ										(* ==, != *)
-%left LESS LEQ GRT GEQ					(* <, <=, >, >= *)
+%right ASSIGN /*COUT CIN*/					/* =, <<, >> */
+%left EQ NEQ										/* ==, != */
+%left LESS LEQ GRT GEQ					/* <, <=, >, >= */
 %left AND OR
-%right RM										(* &&, || *)
-%right NOT											(* ! *)
-%left PLUS MINUS								(* +, - *)
-%left TIMES DIVIDE							(* *, / *)										(* @, ~ *)
-%left SPLIT SEARCH							(* |, # *)
+%right RM										/* &&, || */
+%right NOT											/* ! */
+%left PLUS MINUS								/* +, - */
+%left TIMES DIVIDE							/* *, / */										/* @, ~ */
+%left SPLIT SEARCH							/* |, # */
 %nonassoc LPANGLE
 %nonassoc COUT CIN
 
@@ -49,7 +47,9 @@ fdecl:
 		}
 		
 var_type:
-		(INT | STR | BOOL)	{ [$1] }
+		INT { Int($1) }
+		| STR { String($1) }
+		| BOOL { Boolean($1) }
 		
 formals_opt:
 		/* nothing */ { [] }
