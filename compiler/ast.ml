@@ -8,9 +8,9 @@ type strm = In | Out									(* <<, >>*)
 type at
 
 type var_type = 
-	Int of string
-	|String of string
-	|Boolean of string
+	Int
+	| String
+	| Boolean
 
 type expr =
 	  Integer of int									(* data type: int *)

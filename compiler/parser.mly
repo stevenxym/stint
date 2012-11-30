@@ -11,8 +11,10 @@
 
 %nonassoc NOELSE
 %nonassoc ELSE
-%nonassoc AT
 %nonassoc NOAT
+%nonassoc AT
+%nonassoc NOASSIGN
+
 %right ASSIGN /*COUT CIN*/					/* =, <<, >> */
 %left EQ NEQ										/* ==, != */
 %left LESS LEQ GRT GEQ					/* <, <=, >, >= */
@@ -62,9 +64,6 @@ formal_list:
 vdecl:
 		var_type ID SEMI { ($1, $2) }
 
-vdecl_list:
-		/* EMPTY */	{ [] }
-		| vdecl_list vdecl { $2 :: $1 } 
 
 cont_list:
 		/* EMPTY */ { [] }
@@ -104,11 +103,11 @@ expr:
 		| expr GRT expr { Oper($1, Grt, $3) }
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
 		| ID ASSIGN expr { Assign($1, $3) }
-		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
+		/*| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) } */
 		| expr LPANGLE LIT_INT GRT { Extract($1, SubInt, $3) }
-		| expr LESS LIT_INT GRT { Extract($1, SubStr, $3) }
-		| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
-		| expr LESS LIT_INT GRT ASSIGN expr {}
+		| expr LESS LIT_INT GRT %prec NOASSIGN { Extract($1, SubStr, $3) }
+		/*| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) } */
+		/*| expr LESS LIT_INT GRT ASSIGN expr {}*/
 		| expr SEARCH expr { Chset($1, Fnd, $3) }
 		| expr SPLIT expr { Chset($1, Spl, $3) }
 		| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) }
