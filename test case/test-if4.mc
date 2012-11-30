@@ -7,7 +7,7 @@ void main()
   	<< std 8;
   }
   
-  << std "\n"
+  << std "\n";
   << std 17;
   return;
 }
