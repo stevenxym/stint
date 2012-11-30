@@ -1,8 +1,8 @@
 void main()
 {
-  if (true) {
+  if (!false) {
   	<< std 42;
-  }
+  	}
   << std "\n";
   << std 17;
   return;
