@@ -13,14 +13,16 @@
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc AT
+%nonassoc NOAT
 %right ASSIGN COUT CIN					(* =, <<, >> *)
 %left EQ NEQ										(* ==, != *)
 %left LESS LEQ GRT GEQ					(* <, <=, >, >= *)
-%left AND OR										(* &&, || *)
+%left AND OR
+%right RM										(* &&, || *)
 %right NOT											(* ! *)
 %left PLUS MINUS								(* +, - *)
-%left TIMES DIVIDE							(* *, / *)
-%right AT RM										(* @, ~ *)
+%left TIMES DIVIDE							(* *, / *)										(* @, ~ *)
 %left SPLIT SEARCH							(* |, # *)
 
 %start program
@@ -75,12 +77,32 @@ stmt:
 		| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }
 		| FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt { For($3, $5, $7, $9) }
 		| WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+		| BREAK SEMI { Break }
+		| OPEN expr SEMI { Fop(Open, $2) }
+		| CLOSE expr SEMI { Fop(Close, $2) }
 
+expr:
+		LIT_INT { Integer($1) }
+		| ID { Id($1) }
+		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
+		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
+		| expr PLUS expr AT expr{ OperAt($1, Add, at, $5) }
+		| expr MINUS expr AT expr{ OperAt($1, Sub, at, $5) }
+		| expr TIMES expr { Oper($1, Mult, $3) }
+		| expr DIVIDE expr { Oper($1, Div, $3) }
+		| expr EQ expr { Oper($1, Equal, $3) }
+		| expr NEQ expr { Oper($1, Neq, $3) }
+		| expr LESS expr { Oper($1, Less, $3) }
+		| expr LEQ expr { Oper($1, LessEq, $3) }
+		| expr GRT expr { Oper($1, Grt, $3) }
+		| expr GEQ expr { Oper($1, GrtEq, $3) }
+		| ID ASSIGN expr { Assign($1, $3) }
+		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
+		| expr { Extract($1, SubChar, $3) }
+		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
 
-
-
-
-
+		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+		| LPAREN expr RPAREN { $2 }
 
 
 

@@ -5,13 +5,14 @@ type op = 	Add | Sub | Mult | Div						(* +, -, *, / *)
 type subs = SubChar | SubInt | SubStr					(* [] .<>, <> *)
 type sets = Spl | Fnd									(* |, # *)
 type strm = In | Out									(* <<, >>*)
+type at
 
 type expr =
 	  Integer of int									(* data type: int *)
 	| String of string									(* data type: string *)
 	| Id of string										(* indentifier *)
 	| Oper of expr * op * expr
-	| OperAt of expr * op * expr * expr					(* expr1 + expr2 @ pos *)
+	| OperAt of expr * op * at * expr					(* expr1 + expr2 @ pos *)
 	| Assign of string * expr
 	| Extract of string * subs *int
 	| Sublen of string * int * int						(* str[index, length] *)
