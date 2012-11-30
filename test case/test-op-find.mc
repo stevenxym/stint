@@ -1,0 +1,9 @@
+void main()
+{
+	string s1 = "This is a his thesis";
+	int num = s1 # "is";
+	
+	<< std num;
+
+	return;
+}
