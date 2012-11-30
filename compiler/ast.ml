@@ -11,19 +11,21 @@ type expr =
 	  Integer of int									(* data type: int *)
 	| String of string									(* data type: string *)
 	| Id of string										(* indentifier *)
+	| Std of string
 	| Oper of expr * op * expr
 	| OperAt of expr * op * at * expr					(* expr1 + expr2 @ pos *)
 	| Assign of string * expr
 	| Extract of string * subs *int
 	| Sublen of string * int * int						(* str[index, length] *)
 	| Chset of string * sets *string					(* change set *)
-	| Remove of string
-	| Stream of strm * expr * expr						(* io stream *)
+	| Remove1 of string * int
+	| Remove2 of string * int * int
+	| Stream strm * expr * expr				(* io stream *)
 	| Call of string * expr list
 	| Noexpr											(* for void arg list *)
 
 type fop = Open | Close									(* file operator *)
-
+	
 type stmt =
 	| Block of stmt list
 	| Decl of string * string * expr

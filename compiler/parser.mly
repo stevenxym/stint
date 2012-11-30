@@ -24,6 +24,8 @@
 %left PLUS MINUS								(* +, - *)
 %left TIMES DIVIDE							(* *, / *)										(* @, ~ *)
 %left SPLIT SEARCH							(* |, # *)
+%nonassoc LPANGLE
+%nonassoc COUT CIN
 
 %start program
 %type <Ast.program> program
@@ -82,7 +84,9 @@ stmt:
 
 expr:
 		LIT_INT { Integer($1) }
+		LIT_STR { String($1) }
 		| ID { Id($1) }
+		| STD { Std($1) }
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
 		| expr PLUS expr AT expr{ OperAt($1, Add, at, $5) }
@@ -97,8 +101,22 @@ expr:
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
 		| ID ASSIGN expr { Assign($1, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
+<<<<<<< Updated upstream
 		| expr { Extract($1, SubChar, $3) }
 		| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) }
+=======
+		| expr LPANGLE LIT_INT GRT { Extract($1, SubInt, $3) }
+		| expr LESS LIT_INT GRT { Extract($1, SubStr, $3) }
+		| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
+		| expr LETT LIT_INT GRT ASSIGN expr {}
+		| expr SEARCH expr { Chset($1, Fnd, $2) }
+		| expr SPLIT expr { Chset($1, Spl, $2) }
+		| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) }
+		| RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
+		| CIN expr expr { Stream(In, $2, $3) }
+		| COUT expr expr { Stream(Out, $2, $3) }
+
+>>>>>>> Stashed changes
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
 

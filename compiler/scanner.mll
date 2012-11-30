@@ -18,8 +18,8 @@ rule token = parse
 	| '<'										{ LESS }						| "<="						{ LEQ }
 	| '>'										{ GRT }							| ">="						{ GEQ }
 	| '['										{ LBRACK }					| ']'							{ RBRACK }
-	| ".<"									{ LPANGLE }					| '<'							{ LANGLE }
-	| '>'										{ RANGLE }					| '|'							{ SPLIT }
+	| ".<"									{ LPANGLE }	
+	| '|'							{ SPLIT }
 	| '#'										{ SEARCH }					|	'~'							{ RM }
 	| "&&"									{ AND }							| "||"						{ OR }
 	| '!'										{ NOT }							| "<<"						{ COUT }
@@ -28,8 +28,8 @@ rule token = parse
 	| "if"									{ IF }							| "else"					{ ELSE }
 	| "while"								{ WHILE }						| "return"				{ RETURN }
 	| "open"								{ OPEN }						| "close"					{ CLOSE }
-	| "break"								{ BREAK }						| "eof"						{ EOF }
-	| "void"								{ VOID }						| "std"						{ STD }
+	| "break"								{ BREAK }						| "eof" 						{ EOF }
+	| "void"								{ VOID }						| "std"	as std					{ STD(std) }
 	| "true"								{ TRUE }						| "false"					{ FALSE }
 	| eof										{ END }					(* do as microC *)
 	| digit+ as lit					{ LIT_INT(int_of_string lit) }
