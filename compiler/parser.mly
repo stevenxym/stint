@@ -13,8 +13,6 @@
 %nonassoc ELSE
 %nonassoc NOAT
 %nonassoc AT
-%nonassoc NOASSIGN
-%nonassoc NOLPAREN
 
 %nonassoc COUT CIN
 %right ASSIGN /*COUT CIN*/					/* =, <<, >> */
@@ -53,7 +51,7 @@ fdecl:
 var_type:
 		INT { "int" }
 		| STR { "string" }
-		| BOOL { "boolean"}`
+		| BOOL { "boolean"}
 		
 formals_opt:
 		/* nothing */ { [] }
@@ -78,7 +76,7 @@ stmt:
 		| LBRACE stmt_list RBRACE { Block(List.rev $2) }
 		| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
 		| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }
-		| WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+		| WHILE LPAREN expr RPAREN stmt { While($3, $5) } 
 		| BREAK SEMI { Break }
 		| OPEN expr SEMI { Fop(Open, $2) }
 		| CLOSE expr SEMI { Fop(Close, $2) }
@@ -90,7 +88,7 @@ stmt_list:
 expr:
 		LIT_INT { Integer($1) }
 		|LIT_STR { String($1) }
-		| ID %prec NOLPAREN { Id($1) }
+		| ID { Id($1) }
 		| STD { Std("std") }
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
@@ -107,14 +105,15 @@ expr:
 		| ID ASSIGN expr { Assign($1, $3) }
 		| ID LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) } 
 		| ID LPANGLE LIT_INT RANGLE { Extract($1, SubInt, $3) } 
-		| ID LANGLE LIT_INT RANGLE %prec NOASSIGN { Extract($1, SubStr, $3) } 
+		| ID LANGLE LIT_INT RANGLE { Extract($1, SubStr, $3) } 
 		| ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
-		/*| expr LANGLE LIT_INT RANGLE ASSIGN expr {}*/
+		/*| ID LANGLE LIT_INT RANGLE ASSIGN expr {} */
 		| ID SEARCH expr { Chset($1, Fnd, $3) }
 		| ID SPLIT expr { Chset($1, Spl, $3) }
-		/*| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) } */
-		/* | RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) } */
-		| CIN expr expr { Stream(In, $2, $3) }
+		| RM ID LPANGLE LIT_INT LESS { Remove1($2, $4) } 
+		| RM ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
+		| CIN LIT_STR expr { Stream(In, $2, $3) }
+		| CIN STD expr { Stream(In, $2, $3) }
 		| COUT expr expr { Stream(Out, $2, $3) }
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
