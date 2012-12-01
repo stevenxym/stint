@@ -15,16 +15,16 @@
 %nonassoc AT
 
 %nonassoc COUT CIN
-%right ASSIGN /*COUT CIN*/					/* =, <<, >> */
-%left EQ NEQ										/* ==, != */
-%left LESS LEQ GRT GEQ					/* <, <=, >, >= */
-%left AND OR
-%right RM										/* &&, || */
-%right NOT											/* ! */
-%left PLUS MINUS								/* +, - */
-%left TIMES DIVIDE							/* *, / */										/* @, ~ */
-%left SPLIT SEARCH							/* |, # */
-%nonassoc LPANGLE LANGLE RANGLE
+%right ASSIGN			/* =, <<, >> */
+%left EQ NEQ			/* ==, != */
+%left LESS LEQ GRT GEQ		/* <, <=, >, >= */
+%left AND OR			/* &&, || */
+%right RM			/* ~ */
+%right NOT			/* ! */
+%left PLUS MINUS		/* +, - */
+%left TIMES DIVIDE		/* *, / */
+%left SPLIT SEARCH		/* |, # */
+%nonassoc LPANGLE LANGLE RANGLE /* <| |> .<| */
 
 
 %start program
@@ -89,11 +89,12 @@ expr:
 		LIT_INT { Integer($1) }
 		|LIT_STR { String($1) }
 		| ID { Id($1) }
-		| STD { Std("std") }
+		/*| STD { Std("std") }*/
+		/* ___Operator___ */
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
-		| expr PLUS expr AT expr{ OperAt($1, Add, at, $5) }
-		| expr MINUS expr AT expr{ OperAt($1, Sub, at, $5) }
+		| expr PLUS expr AT expr{ OperAt($1, Add, $3, $5) }
+		| expr MINUS expr AT expr{ OperAt($1, Sub, $3, $5) }
 		| expr TIMES expr { Oper($1, Mult, $3) }
 		| expr DIVIDE expr { Oper($1, Div, $3) }
 		| expr EQ expr { Oper($1, Equal, $3) }
@@ -102,19 +103,29 @@ expr:
 		| expr LEQ expr { Oper($1, LessEq, $3) }
 		| expr GRT expr { Oper($1, Grt, $3) }
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
+		/* ___Extract___ */
+		| ID LBRACK expr RBRACK { Extract($1, SubChar, $3) } 
+		| ID LPANGLE expr RANGLE { Extract($1, SubInt, $3) } 
+		| ID LANGLE expr RANGLE { Extract($1, SubStr, $3) } 
+		| ID LBRACK expr COMMA expr RBRACK { Sublen($1, $3, $5) }
+		/* ___Assign___ */
 		| ID ASSIGN expr { Assign($1, $3) }
-		| ID LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) } 
-		| ID LPANGLE LIT_INT RANGLE { Extract($1, SubInt, $3) } 
-		| ID LANGLE LIT_INT RANGLE { Extract($1, SubStr, $3) } 
-		| ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
-		/*| ID LANGLE LIT_INT RANGLE ASSIGN expr {} */
+		| ID LANGLE expr RANGLE ASSIGN expr { Assign($1, SubSet, $3, $6) }
+		| ID LPANGLE expr RANGLE ASSIGN expr { Assign($1, SubInt, $3, $6) }
+		| ID LBRACK expr COMMA expr RBRACK ASSIGN expr { Assign($1, SubStr, $3, $8) }
+
 		| ID SEARCH expr { Chset($1, Fnd, $3) }
 		| ID SPLIT expr { Chset($1, Spl, $3) }
-		| RM ID LPANGLE LIT_INT LESS { Remove1($2, $4) } 
-		| RM ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
-		| CIN LIT_STR expr { Stream(In, $2, $3) }
-		| CIN STD expr { Stream(In, $2, $3) }
-		| COUT expr expr { Stream(Out, $2, $3) }
+		/* ___Remove___ */
+		| RM ID LPANGLE expr RANGLE { RemoveSet($2, , SubInt, $4) } 
+		| RM ID LANGLE expr RANGLE { RemoveSet($2, , SubSet, $4) }
+		| RM ID LBRACK expr COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
+		/* ____Stream___ */
+		| LIT_STR CIN expr { Stream(In, $1, $3) }
+		| STD CIN expr { Stream(In, "std", $3) }
+		| LIT_STR COUT expr { Stream(Out, $1, $3) }
+		| STD COUT expr { Stream(Out, "std", $3) }
+
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
 
@@ -124,12 +135,4 @@ actuals_opt:
 
 actuals_list:
     expr                    { [$1] }
-  | actuals_list COMMA expr { $3 :: $1 } 
-
-
-
-
-
-
-
-
+  | actuals_list COMMA expr { $3 :: $1 }
