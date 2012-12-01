@@ -1,6 +1,6 @@
 void main()
 {
-	int num = 1 + 2 * 3 - 4/4;
+	int num = 2 + 2 * 3 - 4/4;
 	<< std num;
 	return;
 }
