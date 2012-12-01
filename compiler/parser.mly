@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACK RBRACK LPANGLE LANGLE RANGLE		/* marks */
 %token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			  				/* general operators */
-%token AT SPLIT SEARCH RM NOT AND OR	COUT CIN										/* type-specified operators */
+%token AT SPLIT SEARCH RM NOT AND OR COUT CIN										/* type-specified operators */
 %token INT STR BOOL IF WHILE RETURN OPEN CLOSE BREAK EOF VOID TRUE FALSE STD																				/* key word */
 %token END																				/* don't know whether need it */
 %token <int> LIT_INT
@@ -14,7 +14,9 @@
 %nonassoc NOAT
 %nonassoc AT
 %nonassoc NOASSIGN
+%nonassoc NOLPAREN
 
+%nonassoc COUT CIN
 %right ASSIGN /*COUT CIN*/					/* =, <<, >> */
 %left EQ NEQ										/* ==, != */
 %left LESS LEQ GRT GEQ					/* <, <=, >, >= */
@@ -24,8 +26,8 @@
 %left PLUS MINUS								/* +, - */
 %left TIMES DIVIDE							/* *, / */										/* @, ~ */
 %left SPLIT SEARCH							/* |, # */
-%nonassoc LPANGLE
-%nonassoc COUT CIN
+%nonassoc LPANGLE LANGLE RANGLE
+
 
 %start program
 %type <Ast.program> program
@@ -49,9 +51,9 @@ fdecl:
 		}
 		
 var_type:
-		INT { Int("int") }
-		| STR { String("string") }
-		| BOOL { Boolean("boolean") }
+		INT { "int" }
+		| STR { "string" }
+		| BOOL { "boolean"}`
 		
 formals_opt:
 		/* nothing */ { [] }
@@ -88,7 +90,7 @@ stmt_list:
 expr:
 		LIT_INT { Integer($1) }
 		|LIT_STR { String($1) }
-		| ID { Id($1) }
+		| ID %prec NOLPAREN { Id($1) }
 		| STD { Std("std") }
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
@@ -103,27 +105,27 @@ expr:
 		| expr GRT expr { Oper($1, Grt, $3) }
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
 		| ID ASSIGN expr { Assign($1, $3) }
-		/*| expr LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) } */
-		| expr LPANGLE LIT_INT GRT { Extract($1, SubInt, $3) }
-		| expr LESS LIT_INT GRT %prec NOASSIGN { Extract($1, SubStr, $3) }
-		/*| expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) } */
-		/*| expr LESS LIT_INT GRT ASSIGN expr {}*/
-		| expr SEARCH expr { Chset($1, Fnd, $3) }
-		| expr SPLIT expr { Chset($1, Spl, $3) }
-		| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) }
-		| RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
+		| ID LBRACK LIT_INT RBRACK { Extract($1, SubChar, $3) } 
+		| ID LPANGLE LIT_INT RANGLE { Extract($1, SubInt, $3) } 
+		| ID LANGLE LIT_INT RANGLE %prec NOASSIGN { Extract($1, SubStr, $3) } 
+		| ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Sublen($1, $3, $5) }
+		/*| expr LANGLE LIT_INT RANGLE ASSIGN expr {}*/
+		| ID SEARCH expr { Chset($1, Fnd, $3) }
+		| ID SPLIT expr { Chset($1, Spl, $3) }
+		/*| RM expr LPANGLE LIT_INT LESS { Remove1($2, $4) } */
+		/* | RM expr LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) } */
 		| CIN expr expr { Stream(In, $2, $3) }
 		| COUT expr expr { Stream(Out, $2, $3) }
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
 
-actuals_opt:
-    /* nothing */ { [] }
+actuals_opt: 
+    /* nothing */  { [] }
   | actuals_list  { List.rev $1 }
 
 actuals_list:
     expr                    { [$1] }
-  | actuals_list COMMA expr { $3 :: $1 }
+  | actuals_list COMMA expr { $3 :: $1 } 
 
 
 

@@ -18,7 +18,8 @@ rule token = parse
 	| '<'										{ LESS }						| "<="						{ LEQ }
 	| '>'										{ GRT }							| ">="						{ GEQ }
 	| '['										{ LBRACK }					| ']'							{ RBRACK }
-	| ".<"									{ LPANGLE }	
+	| ".<|"									{ LPANGLE }	
+	| "<|"   {LANGLE}                     |  "|>"  {RANGLE}
 	| '|'							{ SPLIT }
 	| '#'										{ SEARCH }					|	'~'							{ RM }
 	| "&&"									{ AND }							| "||"						{ OR }
