@@ -1,10 +1,10 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACK RBRACK LPANGLE LANGLE RANGLE		/* marks */
-%token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			  				/* general operators */
-%token AT SPLIT SEARCH RM NOT AND OR COUT CIN										/* type-specified operators */
-%token INT STR BOOL IF WHILE RETURN OPEN CLOSE BREAK EOF VOID TRUE FALSE STD																				/* key word */
-%token END																				/* don't know whether need it */
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACK RBRACK LPANGLE LANGLE RANGLE	/* marks */
+%token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			  	/* general operators */
+%token AT SPLIT SEARCH RM NOT AND OR COUT CIN					/* type-specified operators */
+%token INT STR BOOL IF WHILE RETURN OPEN CLOSE BREAK EOF VOID TRUE FALSE STD		/* key word */
+%token END					/* don't know whether need it */
 %token <int> LIT_INT
 %token <string> LIT_STR
 %token <string> ID
@@ -33,12 +33,12 @@
 %%
 
 program:
-		/* nothing */				{ [], [] }
-	| program vdecl				{ ($2 :: fst $1), snd $1 }
+	/* nothing */				{ [], [] }
+	| program vdecl SEMI			{ ($2 :: fst $1), snd $1 }
 	| program fdecl				{ fst $1, ($2 :: snd $1) }
 
 fdecl:
-		var_type ID LPAREN formals_opt RPAREN LBRACE cont_list RBRACE
+		var_type ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
 		{
 			{
 				returnType = $1;
@@ -54,21 +54,23 @@ var_type:
 		| BOOL { "boolean"}
 		
 formals_opt:
-		/* nothing */ { [] }
+	/* nothing */ { [] }
 	| formal_list { List.rev $1 }
 
-formal_list:
-	| var_type ID { [($1, $2)] }
-	| formal_list COMMA var_type ID { ($3, $4) :: $1}
-
 vdecl:
-		var_type ID SEMI { ($1, $2) }
+	var_type ID { ($1, $2, Block([])) }
+	| var_type ID ASSIGN expr { ($1, $2, $4) }
 
+formal_list:
+	| vdecl { [$1] }
+	| formal_list COMMA vdecl { $3 :: $1}
 
+/*
 cont_list:
-		/* EMPTY */ { [] }
+		 { [] }
 		| cont_list stmt { $2 :: $1 }
 		| cont_list vdecl { $2 :: $1}
+*/
 
 stmt:
 		expr SEMI { Expr($1) }
@@ -80,6 +82,7 @@ stmt:
 		| BREAK SEMI { Break }
 		| OPEN expr SEMI { Fop(Open, $2) }
 		| CLOSE expr SEMI { Fop(Close, $2) }
+		| vdecl SEMI { Decl($1) }
 
 stmt_list:
 		/*Nothing*/ { [] }
