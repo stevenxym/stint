@@ -7,10 +7,6 @@ type sets = Spl | Fnd									(* |, # *)
 type strm = In | Out									(* <<, >>*)
 type at
 
-type var_type = 
-	Int
-	| String
-	| Boolean
 
 type expr =
 	  Integer of int									(* data type: int *)
@@ -49,3 +45,4 @@ type func_decl = {
 		body : stmt list;								(* function statements *)
 	}
 
+type program = string list * func_decl list (* global vars, funcs *)
