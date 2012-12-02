@@ -106,6 +106,9 @@ expr:
 		| expr LEQ expr { Oper($1, LessEq, $3) }
 		| expr GRT expr { Oper($1, Grt, $3) }
 		| expr GEQ expr { Oper($1, GrtEq, $3) }
+		| expr AND expr { Oper($1, And, $3) }
+		| expr OR expr { Oper($1, Or, $3) }
+		| NOT expr { Not($2) }
 		/* ___Extract___ */
 		| ID LBRACK expr RBRACK { Extract($1, SubChar, $3) } 
 		| ID LPANGLE expr RANGLE { Extract($1, SubInt, $3) } 
@@ -119,6 +122,7 @@ expr:
 
 		| ID SEARCH expr { Chset($1, Fnd, $3) }
 		| ID SPLIT expr { Chset($1, Spl, $3) }
+
 		/* ___Remove___ */
 		| RM ID LPANGLE expr RANGLE { RemoveSet($2, SubInt, $4) } 
 		| RM ID LANGLE expr RANGLE { RemoveSet($2, SubStr, $4) }
