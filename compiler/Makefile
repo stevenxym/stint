@@ -24,13 +24,13 @@ parser.ml parser.mli : parser.mly
 
 .PHONY: clean
 clean:
-	rm -rf parser.mli parser.ml scanner.ml
+	rm -rf *.cmo *cmi parser.mli parser.ml scanner.ml
 
 
 
-parser.cmo: ast.cmi parser.cmi
-parser.cmx: ast.cmi parser.cmi
+parser.cmo: ast.cmo parser.cmi
+parser.cmx: ast.cmo parser.cmi
 scanner.cmo: parser.cmi
 scanner.cmx: parser.cmx
 ast.cmi:
-parser.cmi: ast.cmi
+parser.cmi: ast.cmo
