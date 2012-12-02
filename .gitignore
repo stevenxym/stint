@@ -1,1 +1,7 @@
 *.DS_Store
+/compiler/parser.ml
+/compiler/parser.mli
+/compiler/parser.output
+/compiler/scanner.ml
+/compiler/*.cmo
+/compiler/*.cmi
