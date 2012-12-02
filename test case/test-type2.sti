@@ -1,7 +1,0 @@
-void main()
-{
-boolean a = true;
-string s = a;
-<< std s;
-return;
-}
