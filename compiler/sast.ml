@@ -23,6 +23,8 @@ type expr =
 	| RemoveStr of string * expr * expr
 	| Stream of strm * string * expr
 	| Call of string * expr list
+	| IntToStr of expr		(* type convert *)
+	| BoolToStr of expr		(* type convert *)
 
 type fop = Open | Close
 
