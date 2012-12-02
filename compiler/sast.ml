@@ -4,7 +4,7 @@ type sop_t = Adds | Subs | Eqs | Neqs
 type subs_t = SubChar | SubInt | SubStr
 type sets_t = Spl | Fnd
 type strm_t = In | Out
-
+ 
 type expr_t = 
 	  Integer of int
 	| String of string
@@ -44,4 +44,7 @@ type func_t = {
 	formals : (string * string * expr) list;
 	body : stmt list; }
 
-type prog_t = (string * string * expr) list * func_decl list
+type prog_t = {
+	vars: (string * string * expr) list;
+	funcs: func_t list;
+	}
