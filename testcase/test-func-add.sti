@@ -7,6 +7,6 @@ void main()
 {
 	int num;
 	num = add (39, 3);
-	<< std num;
+	std << num;
 	return;
 }
