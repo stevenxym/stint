@@ -1,11 +1,11 @@
-type bop = Add | Sub | Mult | Div | Equal | Neq | Less | LessEq | Grt | GrtEq | And | Or
-type uop = Not
-type sop = Adds | Subs | Eqs | Neqs
-type subs = SubChar | SubInt | SubStr
-type sets = Spl | Fnd
-type strm = In | Out
-
-type expr = 
+type bop_t = Add | Sub | Mult | Div | Equal | Neq | Less | LessEq | Grt | GrtEq | And | Or
+type uop_t = Not
+type sop_t = Adds | Subs | Eqs | Neqs
+type subs_t = SubChar | SubInt | SubStr
+type sets_t = Spl | Fnd
+type strm_t = In | Out
+ 
+type expr_t = 
 	  Integer of int
 	| String of string
 	| Id of string
@@ -26,9 +26,9 @@ type expr =
 	| IntToStr of expr		(* type convert *)
 	| BoolToStr of expr		(* type convert *)
 
-type fop = Open | Close
+type fop_t = Open | Close
 
-type stmt = 
+type stmt_t = 
 	  Block of stmt list
 	| Decl of (string * string * expr)
 	| Expr of expr
@@ -38,10 +38,13 @@ type stmt =
 	| Break
 	| Fop of fop * expr
 
-type func_decl = {
+type func_t = {
 	returnType :string;
 	fname : string;
 	formals : (string * string * expr) list;
 	body : stmt list; }
 
-type program = (string * string * expr) list * func_decl list
+type prog_t = {
+	vars: (string * string * expr) list;
+	funcs: func_t list;
+	}
