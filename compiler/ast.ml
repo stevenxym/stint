@@ -1,23 +1,24 @@
-type op = 	Add | Sub | Mult | Div						(* +, -, *, / *)
-					| Equal | Neq						(* ==, != *)
-					| Less | LessEq | Grt | GrtEq		(* <, <=, >, >= *)
-					| And | Or							(* &&, ||*)
-type subs = SubChar | SubInt | SubStr					(* [] .<||>, <||> *)
-type sets = Spl | Fnd									(* |, # *)
-type strm = In | Out									(* <<, >>*)
-
+type bop = 	Add | Sub | Mult | Div		(* +, -, *, / *)
+		| Equal | Neq			(* ==, != *)
+		| Less | LessEq | Grt | GrtEq	(* <, <=, >, >= *)
+		| And | Or			(* &&, ||, ! *)
+type subs = SubChar | SubInt | SubStr		(* [] .<||>, <||> *)
+type sets = Spl | Fnd				(* |, # *)
+type strm = In | Out				(* <<, >>*)
 
 type expr =
 	  Integer of int			(* data type: int *)
 	| String of string			(* data type: string *)
 	| Id of string				(* indentifier *)
-	| Oper of expr * op * expr
-	| OperAt of expr * op * expr * expr	(* expr1 + expr2 @ pos *)
+	| Std of string
+	| Oper of expr * bop * expr
+	| Not of expr
+	| OperAt of expr * bop * expr * expr	(* expr1 + expr2 @ pos *)
 	| Assign of string * expr		(* iden = *)
 	| AssignSet of string * subs * expr * expr (*str*)
 	| Extract of string * subs * expr
-	| Sublen of string * expr * expr		(* str[index, length] *)
-	| Chset of string * sets * expr	(* change set *)
+	| Sublen of string * expr * expr	(* str[index, length] *)
+	| Chset of string * sets * expr		(* change set *)
 	| RemoveSet of string * subs * expr	(* ~str<||>, ~str.<||> *)
 	| RemoveStr of string * expr * expr	(* ~str[,] *)
 	| Stream of strm * string * expr		(* io stream *)

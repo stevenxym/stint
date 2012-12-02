@@ -4,13 +4,16 @@
 #
 
 OBJS = scanner.cmo parser.cmo
+OBJ_LEX = scanner.ml
+OBJ_YACC = parser.mli parser.ml
+
 stint: $(OBJS)
 	ocamlc -o stint $(OBJS)
 
-scanner.ml : scanner.mll
+$(OBJ_LEX): scanner.mll
 	ocamllex scanner.mll
 
-parser.ml parser.mli : parser.mly
+$(OBJ_YACC): parser.mly
 	ocamlyacc -v parser.mly
 
 %.cmo: %.ml
@@ -21,7 +24,7 @@ parser.ml parser.mli : parser.mly
 
 .PHONY: clean
 clean:
-	rm -rf stint *.cmo *cmi parser.mli parser.ml scanner.ml
+	rm -rf stint *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output
 
 
 
