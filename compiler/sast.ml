@@ -44,7 +44,4 @@ type func_t = {
 	formals : (string * string * expr) list;
 	body : stmt list; }
 
-type prog_t = {
-	vars: (string * string * expr) list;
-	funcs: func_t list;
-	}
+type prog_t = (string * string * expr) list * func_t list
