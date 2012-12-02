@@ -7,9 +7,6 @@ OBJS = scanner.cmo parser.cmo
 stint: $(OBJS)
 	ocamlc -o stint $(OBJS)
 
-#parser.ml parser.mli : parser.mly
-#	ocamlyacc parser.mly
-
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
 
@@ -24,7 +21,7 @@ parser.ml parser.mli : parser.mly
 
 .PHONY: clean
 clean:
-	rm -rf *.cmo *cmi parser.mli parser.ml scanner.ml
+	rm -rf stint *.cmo *cmi parser.mli parser.ml scanner.ml
 
 
 
