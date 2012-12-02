@@ -30,7 +30,7 @@ rule token = parse
 	| "while"								{ WHILE }						| "return"				{ RETURN }
 	| "open"								{ OPEN }						| "close"					{ CLOSE }
 	| "break"								{ BREAK }						| "eof" 						{ EOF }
-	| "void"								{ VOID }						| "std"	as std					{ STD(std) }
+	| "void"								{ VOID }						| "std"	as std					{ STD }
 	| "true"								{ TRUE }						| "false"					{ FALSE }
 	| eof										{ END }					(* do as microC *)
 	| digit+ as lit					{ LIT_INT(int_of_string lit) }

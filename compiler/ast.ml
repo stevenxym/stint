@@ -12,7 +12,7 @@ type expr =
 	  Integer of int									(* data type: int *)
 	| String of string									(* data type: string *)
 	| Id of string										(* indentifier *)
-	| Std of string
+	(* | Std of string *)
 	| Oper of expr * op * expr
 	| OperAt of expr * op * at * expr					(* expr1 + expr2 @ pos *)
 	| Assign of string * expr

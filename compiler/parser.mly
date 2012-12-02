@@ -89,7 +89,7 @@ expr:
 		LIT_INT { Integer($1) }
 		|LIT_STR { String($1) }
 		| ID { Id($1) }
-		| STD { Std("std") }
+		| STD { "std" }
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
 		| expr PLUS expr AT expr{ OperAt($1, Add, at, $5) }
@@ -112,9 +112,10 @@ expr:
 		| ID SPLIT expr { Chset($1, Spl, $3) }
 		| RM ID LPANGLE LIT_INT LESS { Remove1($2, $4) } 
 		| RM ID LBRACK LIT_INT COMMA LIT_INT RBRACK { Remove2($2, $4, $6) }
-		| CIN LIT_STR expr { Stream(In, $2, $3) }
-		| CIN STD expr { Stream(In, $2, $3) }
-		| COUT expr expr { Stream(Out, $2, $3) }
+		| CIN LIT_STR LPAREN expr RPAREN { Stream(In, $2, $4) }
+		| CIN STD LPAREN expr RPAREN { Stream(In, "std", $4) } 
+		| COUT LIT_STR LPAREN expr RPAREN { Stream(Out, $2, $4) } 
+		| COUT STD LPAREN expr RPAREN { Stream(Out, "std", $4) } 
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
 
