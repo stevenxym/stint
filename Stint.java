@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class Stint{
 	
 	StringBuilder content;
-	ArrayList<Integer> integers;
-	ArrayList<String> strings;
+	TreeMap<Integer,Integer> integers;
+	TreeMap<Integer, String> strings;
 	String spliter;
 	String chooser;
 
@@ -33,6 +34,10 @@ public class Stint{
 
 	public boolean equals(Stint s){
 		return content.toString().equals(s.toString());
+	}
+	
+	public boolean nonEquals(Stint s){
+		return !equals(s);
 	}
 
 	public Stint add(Stint s){
@@ -91,15 +96,29 @@ public class Stint{
 		if(integers.size()==0){
 			exception("Stint: Invalid Index");
 		}
-		return integers.get(0);
+		int t=0;
+		int key=0;
+		for(Integer i:integers.keySet()){
+			if(t==index)
+				key=i;
+			else t++;
+		}
+		return integers.get(key);
 	}
 
 	public Stint getString(int index){
 		if(spliter==null && chooser==null){
-			if(integers.size()==0){
+			if(strings.size()==0){
 				exception("Stint: Invalid Index");
 			}
-			return new Stint(strings.get(0));
+			int t=0;
+			int key=0;
+			for(Integer i:strings.keySet()){
+				if(t==index)
+					key=i;
+				else t++;
+			}
+			return new Stint(strings.get(key));
 		}else if(spliter!=null){
 			String[] temp=this.toString().split(spliter);
 			if(temp.length-1<index)
@@ -111,19 +130,46 @@ public class Stint{
 	}
 
 	public int split(Stint s){
+		spliter=s.toString();
+		chooser=null;
 		return this.toString().split(spliter).length;
 	}
 
 	public int getCount(Stint s){
+		chooser=s.toString();
+		spliter=null;
 		return this.toString().split(chooser).length-1;
 	}
 
 	public Stint removeInt(int index){
-		return null;
+		if(index>integers.size()-1)
+			exception("Stint: Invalid Index");
+		else{
+			int t=0;
+			int key=0;
+			for(Integer i:integers.keySet()){
+				if(t==index)
+					key=i;
+				else t++;
+			}
+			integers.remove(key);
+			String temp=reBuild();
+			content=new StringBuilder();
+			content.append(key);
+			update();
+		}
+		return this;
 	}
 
-	public Stint remove(int start, int end){
-		return null;
+	public Stint remove(int start, int length){
+		String temp=content.toString();
+		if(start==0)
+			temp=temp.substring(length);
+		else temp=temp.substring(0,start)+temp.substring(start+length);
+		content=new StringBuilder();
+		content.append(temp);
+		update();
+		return this;
 	}
 	
 	public void setByString(Stint s,int index){
@@ -146,6 +192,10 @@ public class Stint{
 
 	private void update(){
 
+	}
+	
+	private String reBuild(){
+		return null;
 	}
 	
 	private void exception(String message){
