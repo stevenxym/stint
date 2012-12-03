@@ -27,12 +27,12 @@ rule token = parse
 	| "if"			{ IF }			| "else"	{ ELSE }
 	| "while"		{ WHILE }		| "return"	{ RETURN }
 	| "open"		{ OPEN }		| "close"	{ CLOSE }
-	| "break"		{ BREAK }		| "eof" 	{ EOF }
+	| "break"		{ BREAK }		| "eof" 	{ END }
 	| "void"		{ VOID }		| "std"		{ STD }
 	| "true"		{ TRUE }		| "false"	{ FALSE }
-	| eof			{ END }			(* do as microC *)
+	| eof			{ EOF }			(* do as microC *)
 	| digit+ as lit					{ LIT_INT(int_of_string lit) }
-	| quote _* quote as lit	{ LIT_STR(lit) }
+	| quote [^'"']* quote as lit	{ LIT_STR(lit) }
 	| lowLetter (lowLetter | upLetter | digit | '_')* as id		{ ID(id) }
 	| _ as char 		{ raise (Failure("illegal character " ^ Char.escaped char)) }
 

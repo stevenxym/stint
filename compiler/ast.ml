@@ -5,10 +5,13 @@ type bop = 	Add | Sub | Mult | Div		(* +, -, *, / *)
 type subs = SubChar | SubInt | SubStr		(* [] .<||>, <||> *)
 type sets = Spl | Fnd				(* |, # *)
 type strm = In | Out				(* <<, >>*)
+type boolean = True | False
+type fop = Open | Close                         (* file operator *)
 
 type expr =
 	  Integer of int			(* data type: int *)
 	| String of string			(* data type: string *)
+	| Boolean of boolean
 	| Id of string				(* indentifier *)
 	| Oper of expr * bop * expr
 	| Not of expr
@@ -22,9 +25,8 @@ type expr =
 	| RemoveStr of string * expr * expr	(* ~str[,] *)
 	| Stream of strm * string * expr		(* io stream *)
 	| Call of string * expr list
+	| Fop of fop * expr
 	| Noexpr				(* for void arg list *)
-
-type fop = Open | Close				(* file operator *)
 	
 type stmt =
 	| Block of stmt list
@@ -34,7 +36,6 @@ type stmt =
 	| If of expr * stmt * stmt		(* if() {} else{} *)
 	| While of expr * stmt			(* while() {} *)
 	| Break
-  | Fop of fop * expr
 
 type func_decl = {
 		returnType :string;
@@ -50,6 +51,7 @@ let rec string_of_expr = function
     Integer(i) -> string_of_int i
   | String(s) -> s
   | Id(s) -> s
+  | Boolean(b) -> (match b with True -> "true" | False -> "false")
   | Oper(e1, o, e2) ->
       string_of_expr e1 ^ " " ^
       (match o with
@@ -83,6 +85,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  | Fop(fop, e) -> (match fop with Open -> "Open " | Close -> "Close ") ^ string_of_expr e
   | Not(e) -> "!" ^ string_of_expr e
   | OperAt(e1, bop, e2, e3) -> string_of_expr e1 ^ " " ^ (match bop with
   Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
@@ -100,7 +103,6 @@ let rec string_of_stmt = function
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | Break -> "break;\n"
-  | Fop(fop, e) -> (match fop with Open -> "Open " | Close -> "Close ") ^ string_of_expr e
 
 let printFormals = function
   (f, s, l) -> f ^ s ^ string_of_expr l 
@@ -112,5 +114,5 @@ let string_of_fdecl fdecl =
   "}\n"
 
 let string_of_program (vars, funcs) =
-  String.concat "" (List.map string_of_stmt vars) ^ "\n" ^
+  String.concat "" (List.map printFormals vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)
