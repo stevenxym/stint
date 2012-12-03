@@ -9,41 +9,42 @@ type expr_t =
 	  Integer of int
 	| String of string
 	| Id of string
-	| BinOp of expr * bop * expr	(* general operator for int & bollean *)
-	| UniOp of uop * expr		(* special for ! *)
-	| StrOp of expr * sop * expr	(* operator for string *)
-	| StrOpAt of expr * sop * expr * expr	(* with @ *)
-	| Assign of string * expr
-	| AssignStr of string * expr	(* assign value to string type *)
-	| AssignSet of string * subs * expr * expr
-	| Extract of string * subs * expr
-	| Sublen of string * expr * expr
-	| Chset of string * sets * expr
-	| RemoveSet of string * subs * expr
-	| RemoveStr of string * expr * expr
-	| Stream of strm * string * expr
-	| Call of string * expr list
-	| IntToStr of expr		(* type convert *)
-	| BoolToStr of expr		(* type convert *)
-	| Fop of fop * expr
+	| BinOp of expr_t * bop_t * expr_t	(* general operator for int & bollean *)
+	| UniOp of uop_t * expr_t		(* special for ! *)
+	| StrOp of expr_t * sop_t * expr_t	(* operator for string *)
+	| StrOpAt of expr_t * sop_t * expr_t * expr_t	(* with @ *)
+	| Assign of string * expr_t
+	| AssignStr of string * expr_t	(* assign value to string type *)
+	| AssignSet of string * subs_t * expr_t * expr_t
+	| Extract of string * subs_t * expr_t
+	| Sublen of string * expr_t * expr_t
+	| Chset of string * sets_t * expr_t
+	| RemoveSet of string * subs_t * expr_t
+	| RemoveStr of string * expr_t * expr_t
+	| Stream of strm_t * string * expr_t
+	| Call of string * expr_t list
+	| IntToStr of expr_t		(* type convert *)
+	| BoolToStr of expr_t		(* type convert *)
+	| Fop of fop_t * expr_t
 	| NoExpr
 
 type fop_t = Open | Close
 
 type stmt_t = 
-	  Block of stmt list
-	| Decl of (string * string * expr)
-	| Expr of expr
-	| Return of expr
-	| If of expr * stmt * stmt
-	| While of expr * stmt
+	  Block of stmt_t list
+	| Decl of (string * string * expr_t)
+	| expr_t of expr_t
+	| Return of expr_t
+	| If of expr_t * stmt_t * stmt_t
+	| While of expr_t * stmt_t
 	| Break
-	
+
 
 type func_t = {
 	returnType :string;
 	fname : string;
-	formals : (string * string * expr) list;
+	formals : (string * string * expr_t) list;
 	body : stmt list; }
 
 type prog_t = (string * string * expr) list * func_t list
+
