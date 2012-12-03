@@ -16,6 +16,7 @@
 
 %nonassoc COUT CIN
 %right ASSIGN			/* =, <<, >> */
+%left OPEN CLOSE
 %left EQ NEQ			/* ==, != */
 %left LESS LEQ GRT GEQ		/* <, <=, >, >= */
 %left AND OR			/* &&, || */

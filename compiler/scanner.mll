@@ -32,7 +32,7 @@ rule token = parse
 	| "true"		{ TRUE }		| "false"	{ FALSE }
 	| eof			{ EOF }			(* do as microC *)
 	| digit+ as lit					{ LIT_INT(int_of_string lit) }
-	| quote _* quote as lit	{ LIT_STR(lit) }
+	| quote [^'"']* quote as lit	{ LIT_STR(lit) }
 	| lowLetter (lowLetter | upLetter | digit | '_')* as id		{ ID(id) }
 	| _ as char 		{ raise (Failure("illegal character " ^ Char.escaped char)) }
 
