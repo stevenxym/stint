@@ -6,6 +6,6 @@ void main()
 
 	if (replaceAll (dest, s, r))
 	{
-		<< std dest;
+		std << dest;
 	}
 }

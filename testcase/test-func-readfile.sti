@@ -6,6 +6,6 @@ void main()
 
 	while ((str = ReadFile(filename)) != eof)
 	{
-		<< std str;
+		std << str;
 	}
 }

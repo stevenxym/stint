@@ -1,13 +1,13 @@
 void main()
 {
   if (false) {
-  	<< std 42;
+  	std << 42;
   } 
   else {
-  	<< std 8;
+  	std << 8;
   }
   
-  << std "\n";
-  << std 17;
+  std << "\n";
+  std << 17;
   return;
 }

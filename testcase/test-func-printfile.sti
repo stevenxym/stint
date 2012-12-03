@@ -6,6 +6,6 @@ void main()
 
 	if (PrintFile (str,filename))
 	{
-		<< std str;
+		std << str;
 	}
 }
