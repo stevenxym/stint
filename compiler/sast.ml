@@ -25,6 +25,8 @@ type expr_t =
 	| Call of string * expr list
 	| IntToStr of expr		(* type convert *)
 	| BoolToStr of expr		(* type convert *)
+	| Fop of fop * expr
+	| NoExpr
 
 type fop_t = Open | Close
 
@@ -36,7 +38,7 @@ type stmt_t =
 	| If of expr * stmt * stmt
 	| While of expr * stmt
 	| Break
-	| Fop of fop * expr
+	
 
 type func_t = {
 	returnType :string;
