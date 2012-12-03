@@ -2,6 +2,6 @@ void main()
 {
 boolean a = true;
 string s = a;
-<< std s;
+std << s;
 return;
 }

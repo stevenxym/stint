@@ -10,16 +10,15 @@ int fib (int x)
 
 void main()
 {
-	<< std fib(0);
-	<< std "\n";
-	<< std fib(1);
-	<< std "\n";
-	<< std fib(2);
-	<< std "\n";
-	<< std fib(3);
-	<< std "\n";
-	<< std fib(4);
-	<< std "\n";
-	<< std fib(5);
-
+	std << fib(0);
+	std << "\n";
+	std << fib(1);
+	std << "\n";
+	std << fib(2);
+	std << "\n";
+	std << fib(3);
+	std << "\n";
+	std << fib(4);
+	std << "\n";
+	std << fib(5);
 }

@@ -16,6 +16,7 @@
 
 %nonassoc COUT CIN
 %right ASSIGN			/* =, <<, >> */
+%left OPEN CLOSE
 %left EQ NEQ			/* ==, != */
 %left LESS LEQ GRT GEQ		/* <, <=, >, >= */
 %left AND OR			/* &&, || */
@@ -47,11 +48,12 @@ fdecl:
 				body = List.rev $7
 			}
 		}
-		
+
 var_type:
 		INT { "int" }
 		| STR { "string" }
 		| BOOL { "boolean"}
+		| VOID { "void" }
 		
 formals_opt:
 	/* nothing */ { [] }
@@ -75,13 +77,12 @@ cont_list:
 stmt:
 		expr SEMI { Expr($1) }
 		| RETURN expr SEMI { Return($2) }
+		| RETURN SEMI { Return(Noexpr) }
 		| LBRACE stmt_list RBRACE { Block(List.rev $2) }
 		| IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
 		| IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7) }
 		| WHILE LPAREN expr RPAREN stmt { While($3, $5) } 
 		| BREAK SEMI { Break }
-		| OPEN expr SEMI { Fop(Open, $2) }
-		| CLOSE expr SEMI { Fop(Close, $2) }
 		| vdecl SEMI { Decl($1) }
 
 stmt_list:
@@ -92,7 +93,8 @@ expr:
 		LIT_INT { Integer($1) }
 		|LIT_STR { String($1) }
 		| ID { Id($1) }
-		/*| STD { Std("std") }*/
+		| TRUE { Boolean(True) }
+		| FALSE { Boolean(False) }
 		/* ___Operator___ */
 		| expr PLUS expr %prec NOAT { Oper($1, Add, $3) }
 		| expr MINUS expr %prec NOAT { Oper($1, Sub, $3) }
@@ -135,6 +137,8 @@ expr:
 
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }
+		| OPEN expr { Fop(Open, $2) }
+		| CLOSE expr { Fop(Close, $2) }
 
 actuals_opt: 
     /* nothing */  { [] }
