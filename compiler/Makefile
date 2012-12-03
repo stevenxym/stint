@@ -3,7 +3,7 @@
 #
 #
 
-OBJS = scanner.cmo parser.cmo stint.cmo
+OBJS = ast.cmo scanner.cmo parser.cmo stint.cmo
 OBJ_LEX = scanner.ml
 OBJ_YACC = parser.mli parser.ml
 
@@ -27,9 +27,12 @@ clean:
 	rm -rf stint *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output
 
 
+ast.cmi:
+ast.cmx:
+stint.cmo: scanner.cmo parser.cmi ast.cmo
+stint.cmx: scanner.cmx parser.cmx ast.cmx
 parser.cmo: ast.cmo parser.cmi
 parser.cmx: ast.cmo parser.cmi
 scanner.cmo: parser.cmi
 scanner.cmx: parser.cmx
-ast.cmi:
 parser.cmi: ast.cmo
