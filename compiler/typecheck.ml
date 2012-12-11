@@ -1,13 +1,13 @@
 open Ast
 open Sast
-open SymbolTable
+open Symboltable
 
 module StringMap = Map.Make(String)
 
 let check_global_var env var =
 	let (v_type, name, value) = var in
-	add_global name v_type env;
-	(v_type, name, value)
+	let ret = add_global name v_type env in
+	if StringMap.is_empty ret then raise (Failure ("variable " ^ name ^ " is already defined")) else (v_type, name, value)
 
 let check_function env funcs = 
 	funcs

@@ -21,7 +21,7 @@ let add_local name v_type env =
 	else StringMap.add name v_type env.locals
 
 let add_global name v_type env =
-	if StringMap.mem name env.globals then raise (Failure ("variable " ^ name ^ " is already defined"))
+	if StringMap.mem name env.globals then (*raise (Failure ("variable " ^ name ^ " is already defined"))*) StringMap.empty
 	else StringMap.add name v_type env.globals
 
 let add_function name v_type env =
