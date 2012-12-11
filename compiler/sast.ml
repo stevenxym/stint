@@ -3,8 +3,9 @@ type uop_t = Not
 type sop_t = Adds | Subs | Eqs | Neqs
 type subs_t = SubChar | SubInt | SubStr
 type sets_t = Spl | Fnd
-type strm_t = In | Out
- 
+type strm_t = In | Out 
+type fop_t = Open | Close
+
 type expr_t = 
 	  Integer of int
 	| String of string
@@ -28,12 +29,10 @@ type expr_t =
 	| Fop of fop_t * expr_t
 	| NoExpr
 
-type fop_t = Open | Close
-
 type stmt_t = 
 	  Block of stmt_t list
 	| Decl of (string * string * expr_t)
-	| expr_t of expr_t
+	| Expr of expr_t
 	| Return of expr_t
 	| If of expr_t * stmt_t * stmt_t
 	| While of expr_t * stmt_t
@@ -44,7 +43,7 @@ type func_t = {
 	returnType :string;
 	fname : string;
 	formals : (string * string * expr_t) list;
-	body : stmt list; }
+	body : stmt_t list; }
 
-type prog_t = (string * string * expr) list * func_t list
+type prog_t = (string * string * expr_t) list * func_t list
 
