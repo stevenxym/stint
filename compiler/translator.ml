@@ -83,25 +83,31 @@ let rec string_of_expr = function
   		string_of_expr s ^ 
   		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2
   	
-  | Stream(s, v, e) ->  v ^ (match s with
-  						  In -> " >> "
-  						  | Out -> " << ") ^ string_of_expr e 
+  | Stream(s, v, e) ->  (if v = "std" then 
+      (match s with
+  			In -> "InputStreamReader istream = new InputStreamReader(System.in); \n
+                 BufferedReader bufRead = new BufferedReader(istream); \n 
+                 String" ^ string_of_expr e ^ " = bufRead.readLine(); \n"
+  			| Out -> "System.out.println(" ^ string_of_expr e ^ "); \n"
+      )
+    else 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  
   | Noexpr -> ""
   | Fop(fop, e) -> let s = f_counter.contents in 
   			f_counter := f_counter.contents + 1;
   			(match fop with 
   			Open -> 
-  			"try { \n File file_" ^ string_of_int s ^ " = new File(" ^ string_of_expr e ^");\n" 
-  			^ "Scanner inFile" ^ string_of_int s ^ "= new Scanner ( file_" ^ string_of_int s ^ ");\n"
+  			  "try { \n File file_" ^ string_of_int s ^ " = new File(" ^ string_of_expr e ^");\n" 
+  			  ^ "Scanner inFile" ^ string_of_int s ^ "= new Scanner ( file_" ^ string_of_int s ^ ");\n"
   			| Close -> "inFile" ^ string_of_int s ^ ".close();\n } \n catch (Exception e) { return false; }" ) 
-  			^ string_of_expr e
+  			  ^ string_of_expr e
   | IntToStr (e) -> string_of_expr e
   | BoolToStr (e) -> string_of_expr e 
   | Not(e) -> "!" ^ string_of_expr e
  
-let string_of_block (sl:stmt_t list) =
+let string_of_block (sl) =
 	let s = "\n" ^ tabs 0 ^ "{\n" in
 	depth := depth.contents + 1;
 	let s = s ^ String.concat "" (List.map string_of_stmt sl) in
@@ -121,8 +127,10 @@ let rec string_of_stmt = function
 let string_of_formals = function
   	(f, s, l) -> f ^ s ^ string_of_expr l 
 
-let string_of_fdecl fdecl =
-  	tabs 0 ^ fdecl.returnType ^ " " ^ fdecl.fname ^ "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")" 
+let string_of_fdecl fdecl = tabs 0 ^
+  (if fdecl.fname = "main" then "public static void main (String args[]) "
+    else fdecl.returnType ^ " " ^ fdecl.fname ^ "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")" 
+    )
   	^ string_of_block  fdecl.body
 
 let java_func_list = function
@@ -130,7 +138,7 @@ let java_func_list = function
 	|funcs -> String.concat "\n" (List.map string_of_fdecl funcs)
 
 let string_of_var = function
-  	(s1, s2, e) -> tabs 0 ^ s1 ^" "^ s2 ^ " = " ^ (string_of_expr e) ^  ";\n" 
+  	(s1, s2, e) -> tabs 0 ^ "Stint" ^" "^ s2 ^ " = " ^ "new Stint(" ^ (string_of_expr e) ^  ");\n" 
 
 let rec java_var_list = function
 	[] -> ""
@@ -139,5 +147,5 @@ let rec java_var_list = function
 
 let rec to_java (vars_t, funcs_t) =
 	depth := 0; 
-	"import java.util.Scanner;\n import java.io.File; \n import java.io.IOException; \n\n" 
-	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t
+	"import java.util.Scanner;\n import java.io.*; \n import java.io.IOException; \n\n class StintJava { \n" 
+	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t ^ "\n }"
