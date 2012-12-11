@@ -22,9 +22,12 @@ $(OBJ_YACC): parser.mly
 %.cmi: %.mli
 	ocamlc -c $<
 
-.PHONY: clean
+.PHONY: clean cleanall
 clean:
-	rm -rf stint *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output
+	rm -rf *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output
+cleanall:
+	rm -rf *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output stint
+
 
 
 ast.cmi:
