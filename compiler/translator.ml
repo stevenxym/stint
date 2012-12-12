@@ -1,4 +1,4 @@
-Open Sast
+open sast
 
 let depth = ref 0
 let f_counter = ref 0
@@ -83,7 +83,7 @@ let rec string_of_expr = function
   		string_of_expr s ^ 
   		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2
   	
-  | Stream(s, v, e) ->  (if v = "std" then 
+  | Stream(s, v, e) ->  if v = "std" then 
       (match s with
   			In -> "Scanner in = new Scanner(System.in); \n 
                  String" ^ string_of_expr e ^ " = in.next(); \n"
@@ -99,6 +99,7 @@ let rec string_of_expr = function
                 "
             | Out -> "pwriter_"^temp^".print(" ^ string_of_expr e ^");\n"
           )
+      )
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")\n"
   
@@ -125,8 +126,8 @@ let string_of_block (sl) =
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
   | Decl(str1, str2, expr) -> tabs 0 ^ str1 ^ " " ^ str2 ^ " = " ^ string_of_expr expr ^ ";\n"
-  | Expr(expr) -> tabs 0 ^ string_of_expr expr ^ ";\n";
-  | Return(expr) -> tabs 0 ^ "return " ^ string_of_expr expr ^ ";\n";
+  | Expr(expr) -> tabs 0 ^ string_of_expr expr ^ ";\n"
+  | Return(expr) -> tabs 0 ^ "return " ^ string_of_expr expr ^ ";\n"
   | If(e, s, Block([])) -> tabs 0 ^ "if (" ^ string_of_expr e ^ ")\n" ^ string_of_block s
   | If(e, s1, s2) ->  tabs 0 ^ "if (" ^ string_of_expr e ^ ")\n" ^ string_of_block s1 ^ "else\n" ^ string_of_block s2
   | While(e, s) -> tabs 0 ^ "while (" ^ string_of_expr e ^ ") " ^ string_of_block s

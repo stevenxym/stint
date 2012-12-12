@@ -1,8 +1,8 @@
-import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class Stint{
-	
+
 	StringBuilder content;
 	TreeMap<Integer,Integer> integers;
 	TreeMap<Integer, String> strings;
@@ -35,7 +35,7 @@ public class Stint{
 	public boolean equals(Stint s){
 		return content.toString().equals(s.toString());
 	}
-	
+
 	public boolean nonEquals(Stint s){
 		return !equals(s);
 	}
@@ -65,7 +65,7 @@ public class Stint{
 			return new Stint(s1.replaceAll(s2, ""));
 		}
 	}
-	
+
 	public Stint minusAt(Stint s, int index){
 		String s1=this.toString().substring(index);
 		String s2=s.toString();
@@ -153,7 +153,7 @@ public class Stint{
 				else t++;
 			}
 			integers.remove(key);
-			String temp=reBuild();
+			reBuild();
 			content=new StringBuilder();
 			content.append(key);
 			update();
@@ -171,33 +171,112 @@ public class Stint{
 		update();
 		return this;
 	}
-	
+
+	//a<index>=s
 	public void setByString(Stint s,int index){
-		
+		if(strings.size()==0){
+			exception("Stint: Invalid Index");
+		}
+		int t=0;
+		int key=0;
+		for(Integer i:integers.keySet()){
+			if(t==index)
+				key=i;
+			else t++;
+		}
+		strings.remove(key);
+		strings.put(key,s.toString());
+		reBuild();
 	}
-	
+
+	//a[index]=s
 	public void setByIndex(Stint s, int index){
-		
+		String temp=content.toString();
+		if(index==0)
+			temp=s.toString()+temp.substring(1);
+		else{
+			String left=content.substring(0,index);
+			String right=content.substring(index+1);
+			content=new StringBuilder();
+			content.append(left+s.toString()+right);
+		}
+		update();
 	}
-	
+
+	//a.<index>=value
 	public void setByInt(int value, int index){
-		
+		if(integers.size()==0){
+			exception("Stint: Invalid Index");
+		}
+		int t=0;
+		int key=0;
+		for(Integer i:integers.keySet()){
+			if(t==index)
+				key=i;
+			else t++;
+		}
+		integers.remove(key);
+		integers.put(key,value);
+		reBuild();
 	}
-	
-	public void setByRange(int start, int length){
-		
+
+	//a[start, length]=s
+	public void setByRange(Stint s, int start, int length){
+		String temp=content.toString();
+		if(start==0)
+			temp=s.toString()+temp.substring(length);
+		else temp=temp.substring(0,start)+s.toString()+temp.substring(start+length);
+		content=new StringBuilder();
+		content.append(temp);
+		update();
 	}
 
 	/* Below are private methods for the maintaince of internal structure */
 
 	private void update(){
+		String temp=content.toString();
+		String[] ints=temp.split("[^0-9]+");
+		int index=0;
+		if(temp.startsWith(ints[0])){
+			integers.put(0, Integer.parseInt(ints[0]));
+			index=3;
+		}else{
+			index=1;
+		}
+		for(int i=0;i<ints.length;i++){
+			integers.put(index, Integer.parseInt(ints[i]));
+			index=index+2;
+		}
+		
+		String[] strs=temp.split("[0-9]+");
+		index=0;
+		if(temp.startsWith(ints[0])){
+			strings.put(0, strs[0]);
+			index=3;
+		}else{
+			index=1;
+		}
+		for(int i=0;i<strs.length;i++){
+			strings.put(index, strs[i]);
+			index=index+2;
+		}
+	}
 
-	}
-	
 	private String reBuild(){
-		return null;
+		TreeMap<Integer, String> temp=new TreeMap<Integer, String>();
+		for(Entry<Integer, String> e:strings.entrySet()){
+			temp.put(e.getKey(), e.getValue());
+		}
+		for(Entry<Integer, Integer> e:integers.entrySet()){
+			temp.put(e.getKey(), e.getValue()+"");
+		}
+		content=new StringBuilder();
+		for(Entry<Integer, String> e:temp.entrySet()){
+			content.append(e.getValue());
+		}
+		return content.toString();
 	}
-	
+
 	private void exception(String message){
 		throw new RuntimeException(message);
 	}
