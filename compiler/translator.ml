@@ -24,18 +24,18 @@ let java_sop = function
 
 let rec string_of_expr = function
     Integer(i) -> string_of_int i
-  | String(s) -> "new Stint(" ^ s ^ ")"
+  | String(s) -> "new Stint(\"" ^ s ^ "\")"
   | Boolean(b) -> 
   		(match b with 
   			True -> "true"
-  			| False -> "False")
+  			| False -> "false"  )
   | Id(s) -> s
   | BinOp(e1, o, e2) ->
       string_of_expr e1 ^ " " ^
       (match o with
-		Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
+		    Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
       	| Equal -> "==" | Neq -> "!=" | Less -> "<" | LessEq -> "<=" 
-      	| Grt -> ">" | GrtEq -> ">=" | And -> "&&" | Or -> "||") 
+      	| Grt -> ">" | GrtEq -> ">=" | And -> "&&" | Or -> "||"   ) 
       ^ " " ^ string_of_expr e2
   | UniOp(o, e1) ->
  	  (match  o with 
@@ -43,7 +43,7 @@ let rec string_of_expr = function
   | StrOp(e1, o, e2) ->  
   		string_of_expr e1 ^ 
   		(match o with
-			Adds -> ".add(" ^ string_of_expr e2 ^ ")"
+			 Adds -> ".add(" ^ string_of_expr e2 ^ ")"
   			| Subs -> ".minus(" ^ string_of_expr e2 ^ ")"
   			| Eqs -> ".equals(" ^ string_of_expr e2 ^ ")"
   			| Neqs -> ".nonEquals(" ^ string_of_expr e2 ^ ")")
@@ -70,10 +70,10 @@ let rec string_of_expr = function
   		(match st with
   			SubChar -> ".getSubstring(" ^ string_of_expr e ^")"
   			| SubInt -> ".getInt(" ^ string_of_expr e ^ ")"
-  			| SubStr -> ".getString(" ^ string_of_expr e ^ ")")
+  			| SubStr -> ".getString(" ^ string_of_expr e ^ ")"   )
   | Sublen(s, e1, e2) ->
   		s ^ ".getSubstring(" ^ string_of_expr e1 ^
-  			" ," ^ string_of_expr e2 ^ ")"
+  			", " ^ string_of_expr e2 ^ ")"
   | Chset(s,set, e) -> 
   		s ^ 
   		(match set with 
@@ -82,31 +82,29 @@ let rec string_of_expr = function
   | RemoveSet(s, st, e) -> 
   		s ^ 
   		(match st with
-  			SubChar -> ".removeInt(" ^ string_of_expr e ^ ")"
+  			SubChar -> ".removeChar(" ^ string_of_expr e ^ ")"
   			| SubInt -> ".removeInt(" ^ string_of_expr e ^ ")"
-  			| SubStr -> ".removeInt(" ^ string_of_expr e ^")")
-  | RemoveStr(s, e1, e2) ->
+  			| SubStr -> ".removeString(" ^ string_of_expr e ^")")
+  | RemoveRange(s, e1, e2) ->
   		s ^ 
-  		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2 ^")"
+  		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")"
   	
   | Stream(s, v, e) ->  if v = "std" then 
       (match s with
-  			In -> "Scanner in = new Scanner(System.in); \n 
-                 Stint " ^ string_of_expr e ^ " = new Stint(in.next()); \n"
-  			| Out -> "System.out.println((" ^ string_of_expr e ^ ").toString()); \n"
+  			In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
+  			| Out -> "System.out.println((" ^ string_of_expr e ^ ").toString())"
       )
     else (let temp = String.sub v 0 (String.rindex v '.')  in
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
                 "while (in_"^ temp ^".hasNextLine()) {\n
                 "^ string_of_expr e ^" = new Stint( in_"^ temp ^".nextLine());\n
-                System.out.println("^ string_of_expr e ^".toString());\n }\n
-                "
-            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e ^").toString());\n"
+                System.out.println("^ string_of_expr e ^".toString());\n }"
+            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e ^").toString())"
           )
       )
   | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")\n"
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
   | NoExpr -> ""
   | Fop(fop, e) -> let str = string_of_expr e in
@@ -114,7 +112,7 @@ let rec string_of_expr = function
         (match fop with 
   			 Open -> "try { \n File file_" ^ temp ^ " = new File((" ^ string_of_expr e ^").toString());\n
                   Scanner in_" ^ temp ^ " = new Scanner(file_" ^ temp ^ ");\n 
-                  PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp ^ "));" 
+                  PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp ^ "))" 
   			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_"^temp^".close();\n } \n 
                     catch (Exception e) { \n System.err.println (e); }\n" ) 
 
@@ -139,7 +137,8 @@ let string_of_formals = function
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
-    else (if fdecl.returnType = "int" || fdecl.returnType = "bool" then fdecl.returnType else "Stint" )^ " " ^ fdecl.fname ^ "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n" 
+    else (if fdecl.returnType = "int" || fdecl.returnType = "bool" then fdecl.returnType else "Stint" )
+          ^ " " ^ fdecl.fname ^ "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n" 
     )
   	^ string_of_block  fdecl.body
 
