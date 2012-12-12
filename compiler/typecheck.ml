@@ -84,7 +84,7 @@ let rec check_expr env = function
 	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e);
 	| Call(func, e_list) -> Sast.Call(func, e_list);
 	| Fop(fop, e) -> Sast.Fop(fop, e);
-	| Noexpr -> Sast.Noexpr
+	| Noexpr -> (Sast.Noexpr, "void")
 
 let check_global_var env var =
 	let (v_type, name, value) = var in
@@ -97,7 +97,23 @@ let rec check_functions env funcs =
 	| hd::tl -> (check_function env hd) :: (check_functions env tl) 
 
 let check_function env func =
-	let add_function func.fname func.returnType env
+	let env.locals = StringMap.empty in
+	let ret = add_function func.fname func.returnType env in
+	if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
+	else {returnType = func.returnType; fname = func.fname; formals = (check_formals env func.formals); body = (check_stmt_list env func func.body)}
+
+let check_formal env formal = 
+	let (s1, s2, expr) = formal in
+	let e = check_expr env expr in
+		if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
+	    else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
+        else if s1 == "string" && (snd e == "int" || snd e == "boolean") then (s1, s2, Sast.ToStr(fst e)) 
+	    else (s1, s2, fst e)
+
+let rec check_formals env formals = 
+	match formals with 
+	  [] -> []
+	| hd::tl -> (check_formal env hd) :: (check_formals env tl) 
 
 let check_program (vars, funcs) = 
 	let env = {	locals = StringMap.empty;
@@ -108,7 +124,11 @@ let check_program (vars, funcs) =
 
 let rec check_stmt env func = function
 	  Block(stmt_list) -> Sast.Block(check_stmt_list env func stmt_list)
-	| Decl(s1, s2, expr) -> let e = check_expr env expr in Sast.Decl(s1, s2, fst e)
+	| Decl(s1, s2, expr) -> let e = check_expr env expr in
+							if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
+	        				else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
+	        				else if s1 == "string" && (snd e == "int" || snd e == "boolean") then Sast.Decl(s1, s2, Sast.ToStr(fst e)) 
+							else Sast.Decl(s1, s2, fst e)
 	| Expr(expr) -> fst (check_expr env expr)
 	| Return(expr) -> let e = check_expr env expr in
 					  if (snd e != func.returnType) then raise (Failure ("The return type doesn't match!"))
