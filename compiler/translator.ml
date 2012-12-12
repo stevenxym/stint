@@ -78,7 +78,7 @@ let rec string_of_expr = function
   		s ^ 
   		(match set with 
   			Spl -> ".split(" ^ string_of_expr e
-  			| Fnd -> ".getCount(" ^ string_of_expr e)
+  			| Fnd -> ".getCount(" ^ string_of_expr e^")")
   | RemoveSet(s, st, e) -> 
   		s ^ 
   		(match st with
@@ -87,23 +87,22 @@ let rec string_of_expr = function
   			| SubStr -> ".removeInt(" ^ string_of_expr e ^")")
   | RemoveStr(s, e1, e2) ->
   		s ^ 
-  		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2
+  		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2 ^")"
   	
   | Stream(s, v, e) ->  if v = "std" then 
       (match s with
   			In -> "Scanner in = new Scanner(System.in); \n 
-                 String" ^ string_of_expr e ^ " = in.next(); \n"
-  			| Out -> "System.out.println(" ^ string_of_expr e ^ "); \n"
+                 Stint " ^ string_of_expr e ^ " = new Stint(in.next()); \n"
+  			| Out -> "System.out.println((" ^ string_of_expr e ^ ").toString()); \n"
       )
-    else (let str = string_of_expr e in
-          let temp = String.sub str 10 ((String.rindex str '.') - 10) in
+    else (let temp = String.sub v 0 (String.rindex v '.')  in
           (match s with
-            In -> "String line_"^temp^"=null;\n
-                while (in_"^temp^".hasNextLine()) {\n
-                line_"^temp^" = in_"^temp^".nextLine();\n
-                System.out.println(line_"^temp^");\n }\n
+            In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
+                "while (in_"^ temp ^".hasNextLine()) {\n
+                "^ string_of_expr e ^" = new Stint( in_"^ temp ^".nextLine());\n
+                System.out.println("^ string_of_expr e ^".toString());\n }\n
                 "
-            | Out -> "pwriter_"^temp^".print(" ^ string_of_expr e ^");\n"
+            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e ^").toString());\n"
           )
       )
   | Call(f, el) ->
