@@ -24,7 +24,7 @@ type expr_t =
 	| Sublen of string * expr_t * expr_t
 	| Chset of string * sets_t * expr_t
 	| RemoveSet of string * subs_t * expr_t
-	| RemoveStr of string * expr_t * expr_t
+	| RemoveRange of string * expr_t * expr_t
 	| Stream of strm_t * string * expr_t
 	| Call of string * expr_t list
 	| ToStr of expr_t		(* type convert *)
