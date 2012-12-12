@@ -85,24 +85,33 @@ let rec string_of_expr = function
   	
   | Stream(s, v, e) ->  (if v = "std" then 
       (match s with
-  			In -> "InputStreamReader istream = new InputStreamReader(System.in); \n
-                 BufferedReader bufRead = new BufferedReader(istream); \n 
-                 String" ^ string_of_expr e ^ " = bufRead.readLine(); \n"
+  			In -> "Scanner in = new Scanner(System.in); \n 
+                 String" ^ string_of_expr e ^ " = in.next(); \n"
   			| Out -> "System.out.println(" ^ string_of_expr e ^ "); \n"
       )
-    else 
+    else (let str = string_of_expr e in
+          let temp = String.sub str 1 ((String.rindex str '.') - 1) in
+          (match s with
+            In -> "String line_"^temp^"=null;\n
+                while (in_"^temp^".hasNextLine()) {\n
+                line_"^temp^" = in_"^temp^".nextLine();\n
+                System.out.println(line_"^temp^");\n }\n
+                "
+            | Out -> "pwriter_"^temp^".print(" ^ string_of_expr e ^");\n"
+          )
   | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")\n"
   
   | Noexpr -> ""
-  | Fop(fop, e) -> let s = f_counter.contents in 
-  			f_counter := f_counter.contents + 1;
-  			(match fop with 
-  			Open -> 
-  			  "try { \n File file_" ^ string_of_int s ^ " = new File(" ^ string_of_expr e ^");\n" 
-  			  ^ "Scanner inFile" ^ string_of_int s ^ "= new Scanner ( file_" ^ string_of_int s ^ ");\n"
-  			| Close -> "inFile" ^ string_of_int s ^ ".close();\n } \n catch (Exception e) { return false; }" ) 
-  			  ^ string_of_expr e
+  | Fop(fop, e) -> let str = string_of_expr e in
+          let temp = String.sub str 1 ((String.rindex str '.') - 1) in 
+        (match fop with 
+  			 Open -> "try { \n File file_" ^ temp ^ " = new File(" ^ string_of_expr e ^");\n
+                  Scanner in_" ^ temp " = new Scanner (file_" ^ temp ");\n 
+                  PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp "));" 
+  			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_"^temp^".close();\n } \n 
+                    catch (Exception e) { \n System.err.println (e); }\n" ) 
+  
   | IntToStr (e) -> string_of_expr e
   | BoolToStr (e) -> string_of_expr e 
   | Not(e) -> "!" ^ string_of_expr e
