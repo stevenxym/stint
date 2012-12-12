@@ -5,12 +5,12 @@ type subs_t = SubChar | SubInt | SubStr
 type sets_t = Spl | Fnd
 type strm_t = In | Out 
 type fop_t = Open | Close
-type boolean = True | False
+type boolean_t = True | False
 
 type expr_t = 
 	  Integer of int
 	| String of string
-	| Boolean of boolean
+	| Boolean of boolean_t
 	| Id of string
 	| BinOp of expr_t * bop_t * expr_t	(* general operator for int & bollean *)
 	| UniOp of uop_t * expr_t		(* special for ! *)
