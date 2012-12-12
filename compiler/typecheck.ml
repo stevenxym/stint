@@ -3,14 +3,24 @@ open Symboltable
 
 module StringMap = Map.Make(String)
 
+(* get the type of expression:
+ *  -> string if one of the two operands having string type
+ *  -> int/boolean if both of the operands having the same type *)
 let get_expr_type t1 t2 =
 	if t1 == "string" || t2 == "string" then "string" else
 	if t1 == "int" && t2 == "int" then "int" else
 	if t1 == "boolean" && t2 == "boolean" then "boolean" else
 	raise (Failure ("type error"))
 
+(* mark int & boolean expression to string type *)
 let conv_type = function 
 	(expr, t) -> if t != "string" then Sast.ToStr(expr) else expr
+
+(* get variable type according to the name
+ * raise error if no name matching in variable list *)
+let get_vartype env id = 
+	let t = find_variable id env in
+	if t == "" then raise (Failure ("undefined variable " ^ id)) else t
 
 let match_oper e1 op e2 =
 	let expr_t = get_expr_type (snd e1) (snd e2) in
@@ -45,52 +55,70 @@ let match_oper e1 op e2 =
 
 let match_str_oper e1 op e2 pos =
 	match op with
-	  Add -> (Sast.StrOpAt((fst e1), Sast.Adds, (fst e2), (fst pos)), "string")
-	  | Sub -> (Sast.StrOpAt((fst e1), Sast.Subs, (fst e2), (fst pos)), "string")
+	  Add -> (Sast.StrOpAt((fst e1), Sast.Adds, (fst e2), pos), "string")
+	  | Sub -> (Sast.StrOpAt((fst e1), Sast.Subs, (fst e2), pos), "string")
 	  | _ -> raise (Failure ("type error"))
 
 let rec check_expr env = function
-	Integer(i) -> (Sast.Integer(i), "int")
-	| String(s) -> (Sast.String(s), "string")
+	Integer(i) -> Sast.Integer(i), "int"
+	| String(s) -> Sast.String(s), "string"
 	| Boolean(b) -> (match b with True -> (Sast.Boolean(Sast.True), "boolean")
 			| False -> (Sast.Boolean(Sast.False), "boolean"))
+
 	| Id(id) ->
-		let t = find_variable id env in
-		if t == "" then raise (Failure ("undefined variable " ^ id))
-		else (Sast.Id(id), t)
+		Sast.Id(id), (get_vartype env id)
+
 	| Oper(e1, op, e2) ->
-		let fst_expr = check_expr env e1 in
-		let snd_expr = check_expr env e2 in
-		match_oper fst_expr op snd_expr
+		match_oper (check_expr env e1) op (check_expr env e2)
+
 	| Not(e) ->
-		let (expr, t) = check_expr env e in
-		if t == "boolean" then (Sast.UniOp(Sast.Not, expr), "boolean") else
-		raise (Failure ("type error"))
+		Sast.UniOp(Sast.Not, (get_expr_with_type env e "boolean")), "boolean"
+
 	| OperAt(e1, op, e2, pos) ->
-		let fst_expr = check_expr env e1 in
-		let snd_expr = check_expr env e2 in
-		let position = check_expr env pos in
-		if (snd position) != "int" then raise (Failure ("type error")) else
+		let fst_expr = check_expr env e1
+		and snd_expr = check_expr env e2
+		and position = get_expr_with_type env pos "int" in
 		if (get_expr_type (snd fst_expr) (snd snd_expr)) != "string" then raise (Failure ("type error"))
 		else match_str_oper fst_expr op snd_expr position
+
 	| Assign(id, e) ->
-		let t = find_variable id env in
-		let expr = check_expr env e in
-		if t == "" then raise (Failure ("type error")) else
-		if t != (snd expr) then raise (Failure ("type error")) else
-		if t == "string" then (Sast.AssignStr(id, (fst expr)), t) else
-		   (Sast.Assign(id, (fst expr)), t)
-	| AssignSet(id, subs, i, e) -> Sast.AssignSet(id, subs, i, e)
-	| AssignRange(id, index, len, e) -> Sast.AssignRange(id, index, len, e)
+		let t = get_vartype env id in
+		let expr = get_expr_with_type env e t in
+		if t == "string" then (Sast.AssignStr(id, (conv_type (expr,t))), t)
+		else Sast.Assign(id, expr), t
+
+	| AssignSet(id, subs, i, e) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else let index = get_expr_with_type env i "int"
+		     and expr = check_expr env e in
+		     ( match subs with
+			  SubChar -> Sast.AssignSet(id, Sast.SubChar, index, (conv_type expr)), "string"
+			| SubInt  -> if (snd expr) != "int" then raise (Failure ("type error"))
+				     else Sast.AssignSet(id, Sast.SubInt, index, (fst expr)), "int"
+			| SubStr  -> Sast.AssignSet(id, Sast.SubStr, index, (conv_type expr)), "string" )
+
+	| AssignRange(id, i, l, e) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else Sast.AssignRange(  id,
+					get_expr_with_type env i "int",
+					get_expr_with_type env l "int",
+					conv_type (check_expr env e)), "string"
+
 	| Extract(id, subs, i) -> Sast.Extract(id, subs, i)
 	| Sublen(id, i, len) -> Sast.Sublen(id, i, len)
 	| Chset(id, sets, str) -> Sast.Chset(id, sets, str)
 	| RemoveSet(id, subs, i) -> Sast.RemoveSet(id, subs, i)
-	| RemoveStr(id, i, len) -> Sast.RemoveStr(id, i, len)
+	| RemoveRange(id, i, len) -> Sast.RemoveStr(id, i, len)
 	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e)
 	| Call(func, e_list) -> Sast.Call(func, e_list)
 	| Fop(fop, e) -> Sast.Fop(fop, e)
 	| Noexpr -> Sast.Noexpr
+
+(* get expr_t(sast type) by expr(ast type) with given type
+ * raise error if the expression type does match requirement *)
+and get_expr_with_type env expr t = 
+	let e = check_expr env expr in
+	if (snd e) != t then raise (Failure ("type error")) else (fst e)
 
 let check_global_var env var =
 	let (v_type, name, value) = var in

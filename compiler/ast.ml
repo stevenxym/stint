@@ -23,8 +23,8 @@ type expr =
 	| Sublen of string * expr * expr	(* str[index, length] *)
 	| Chset of string * sets * expr		(* change set *)
 	| RemoveSet of string * subs * expr	(* ~str<||>, ~str.<||> *)
-	| RemoveStr of string * expr * expr	(* ~str[,] *)
-	| Stream of strm * string * expr		(* io stream *)
+	| RemoveRange of string * expr * expr	(* ~str[,] *)
+	| Stream of strm * string * expr	(* io stream *)
 	| Call of string * expr list
 	| Fop of fop * expr
 	| Noexpr				(* for void arg list *)
@@ -80,7 +80,7 @@ let rec string_of_expr = function
   									SubChar -> "[" ^ string_of_expr e ^ "]"
   									| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
   									| SubStr -> "<|" ^ string_of_expr e ^ "|>")
-  | RemoveStr(v, e1, e2) -> "~" ^ v ^ "[" ^ string_of_expr e1 ^ ", " ^ string_of_expr e2 ^ "]"
+  | RemoveRange(v, e1, e2) -> "~" ^ v ^ "[" ^ string_of_expr e1 ^ ", " ^ string_of_expr e2 ^ "]"
   | Stream(s, v, e) ->  v ^ (match s with
   						  In -> " >> "
   						  | Out -> " << ") ^ string_of_expr e 

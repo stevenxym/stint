@@ -3,7 +3,9 @@
 #
 #
 
-OBJS = ast.cmo sast.cmo symboltable.cmo typecheck.cmo scanner.cmo parser.cmo stint.cmo translator.cmo
+OBJS = scanner.cmo parser.cmo				\
+	ast.cmo sast.cmo symboltable.cmo typecheck.cmo	\
+	stint.cmo translator.cmo
 OBJ_LEX = scanner.ml
 OBJ_YACC = parser.mli parser.ml
 
