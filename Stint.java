@@ -2,6 +2,13 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+/***
+ * This class is used as a utility class for Stint language to replace the 
+ * original String class Java offers
+ * @author JohnWoo
+ *
+ */
+
 public class Stint{
 
 	StringBuilder content;
@@ -172,7 +179,7 @@ public class Stint{
 		return this;
 	}
 
-	public Stint remove(int start, int length){
+	public Stint removeRange(int start, int length){
 		String temp=content.toString();
 		if(start==0)
 			temp=temp.substring(length);
@@ -180,6 +187,15 @@ public class Stint{
 		content=new StringBuilder();
 		content.append(temp);
 		update();
+		return this;
+	}
+	
+	public Stint removeChar(int index){
+		return removeRange(index,1);
+	}
+	
+	public Stint removeString(int index){
+		this.setByString(new Stint(),index);
 		return this;
 	}
 
