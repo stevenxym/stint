@@ -10,8 +10,7 @@ let get_expr_type t1 t2 =
 	raise (Failure ("type error"))
 
 let conv_type = function 
-	(expr, t) -> if t == "int" then Sast.IntToStr(expr) else
-			if t == "boolean" then Sast.BoolToStr(expr) else expr
+	(expr, t) -> if t != "string" then Sast.ToStr(expr) else expr
 
 let match_oper e1 op e2 =
 	let expr_t = get_expr_type (snd e1) (snd e2) in
@@ -44,10 +43,11 @@ let match_oper e1 op e2 =
 	 	 (Sast.BinOp(fst e1, Sast.Or, fst e2), "boolean")
 	)
 
-let match_str_oper e1 op e2 =
+let match_str_oper e1 op e2 pos =
 	match op with
-	  Add -> 
-
+	  Add -> (Sast.StrOpAt((fst e1), Sast.Adds, (fst e2), (fst pos)), "string")
+	  | Sub -> (Sast.StrOpAt((fst e1), Sast.Subs, (fst e2), (fst pos)), "string")
+	  | _ -> raise (Failure ("type error"))
 
 let rec check_expr env = function
 	Integer(i) -> (Sast.Integer(i), "int")
@@ -70,20 +70,26 @@ let rec check_expr env = function
 		let fst_expr = check_expr env e1 in
 		let snd_expr = check_expr env e2 in
 		let position = check_expr env pos in
-		if (snd pos) != "int" then raise (Failure ("type error")) else
+		if (snd position) != "int" then raise (Failure ("type error")) else
 		if (get_expr_type (snd fst_expr) (snd snd_expr)) != "string" then raise (Failure ("type error"))
-		else
-		Sast.StrOpAt(e1, op, e2, pos)
-	| Assign(id, e) -> Sast.Assign(id, e);
-	| AssignSet(id, subs, i, e) -> Sast.AssignSet(id, subs, i, e);
-	| Extract(id, subs, i) -> Sast.Extract(id, subs, i);
-	| Sublen(id, i, len) -> Sast.Sublen(id, i, len);
-	| Chset(id, sets, str) -> Sast.Chset(id, sets, str);
-	| RemoveSet(id, subs, i) -> Sast.RemoveSet(id, subs, i);
-	| RemoveStr(id, i, len) -> Sast.RemoveStr(id, i, len);
-	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e);
-	| Call(func, e_list) -> Sast.Call(func, e_list);
-	| Fop(fop, e) -> Sast.Fop(fop, e);
+		else match_str_oper fst_expr op snd_expr position
+	| Assign(id, e) ->
+		let t = find_variable id env in
+		let expr = check_expr env e in
+		if t == "" then raise (Failure ("type error")) else
+		if t != (snd expr) then raise (Failure ("type error")) else
+		if t == "string" then (Sast.AssignStr(id, (fst expr)), t) else
+		   (Sast.Assign(id, (fst expr)), t)
+	| AssignSet(id, subs, i, e) -> Sast.AssignSet(id, subs, i, e)
+	| AssignRange(id, index, len, e) -> Sast.AssignRange(id, index, len, e)
+	| Extract(id, subs, i) -> Sast.Extract(id, subs, i)
+	| Sublen(id, i, len) -> Sast.Sublen(id, i, len)
+	| Chset(id, sets, str) -> Sast.Chset(id, sets, str)
+	| RemoveSet(id, subs, i) -> Sast.RemoveSet(id, subs, i)
+	| RemoveStr(id, i, len) -> Sast.RemoveStr(id, i, len)
+	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e)
+	| Call(func, e_list) -> Sast.Call(func, e_list)
+	| Fop(fop, e) -> Sast.Fop(fop, e)
 	| Noexpr -> Sast.Noexpr
 
 let check_global_var env var =

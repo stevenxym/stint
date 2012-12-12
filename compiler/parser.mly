@@ -120,7 +120,8 @@ expr:
 		| ID ASSIGN expr { Assign($1, $3) }
 		| ID LANGLE expr RANGLE ASSIGN expr { AssignSet($1, SubStr, $3, $6) }
 		| ID LPANGLE expr RANGLE ASSIGN expr { AssignSet($1, SubInt, $3, $6) }
-		| ID LBRACK expr COMMA expr RBRACK ASSIGN expr { AssignSet($1, SubStr, $3, $8) }
+		| ID LBRACK expr RBRACK ASSIGN expr {AssignSet($1, SubStr, $3, $6)}
+		| ID LBRACK expr COMMA expr RBRACK ASSIGN expr { AssignRange($1, $3, $5, $8) }
 
 		| ID SEARCH expr { Chset($1, Fnd, $3) }
 		| ID SPLIT expr { Chset($1, Spl, $3) }
