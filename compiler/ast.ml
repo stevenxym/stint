@@ -17,7 +17,8 @@ type expr =
 	| Not of expr
 	| OperAt of expr * bop * expr * expr	(* expr1 + expr2 @ pos *)
 	| Assign of string * expr		(* iden = *)
-	| AssignSet of string * subs * expr * expr (*str*)
+	| AssignSet of string * subs * expr * expr
+	| AssignRange of string * expr * expr * expr	(*str[,]=*)
 	| Extract of string * subs * expr
 	| Sublen of string * expr * expr	(* str[index, length] *)
 	| Chset of string * sets * expr		(* change set *)
@@ -66,6 +67,7 @@ let rec string_of_expr = function
   									| SubInt -> ".<|" ^ string_of_expr e1 ^ "|>"
   									| SubStr -> "<|" ^ string_of_expr e1 ^ "|>")
   								^ " = " ^ string_of_expr e2
+  | AssignRange(v, i, l, e) -> v ^"["^ string_of_expr i ^","^ string_of_expr l^"]=" ^ string_of_expr e
   | Extract(v, s, e) -> v ^ (match s with 
   									SubChar -> "[" ^ string_of_expr e ^ "]"
   									| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
