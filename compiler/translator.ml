@@ -60,9 +60,11 @@ let rec string_of_expr = function
   		s1 ^ " = " ^  string_of_expr e2
   | AssignSet (s1, st, e1, e2) ->
   		s1 ^ (match st with
-  			SubChar -> ".setByIndex(" ^ string_of_expr e2 ^","^ string_of_expr e1 ^")"
-  			| SubInt -> ".setByInt(" ^ string_of_expr e2 ^","^ string_of_expr e1 ^ ")"
-  			| SubStr -> ".setByString(" ^ string_of_expr e2 ^","^ string_of_expr e1 ^ ")")
+  			SubChar -> ".setByIndex(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^")"
+  			| SubInt -> ".setByInt(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^ ")"
+  			| SubStr -> ".setByString(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^ ")")
+  | AssignRange (s1, e1, e2, e3) ->
+      s1 ^ ".setByRange(" ^ string_of_expr e3 ^", "^ string_of_expr e1 ^", "^string_of_expr e2 ^")" 
   | Extract (s, st, e) ->
   		s ^
   		(match st with
@@ -111,7 +113,7 @@ let rec string_of_expr = function
   | Fop(fop, e) -> let str = string_of_expr e in
           let temp = String.sub str 1 ((String.rindex str '.') - 1) in 
         (match fop with 
-  			 Open -> "try { \n File file_" ^ temp ^ " = new File(" ^ string_of_expr e ^");\n
+  			 Open -> "try { \n File file_" ^ temp ^ " = new File((" ^ string_of_expr e ^").toString());\n
                   Scanner in_" ^ temp ^ " = new Scanner (file_" ^ temp ^ ");\n 
                   PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp ^ "));" 
   			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_"^temp^".close();\n } \n 
