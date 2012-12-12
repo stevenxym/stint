@@ -24,7 +24,7 @@ let java_sop = function
 
 let rec string_of_expr = function
     Integer(i) -> string_of_int i
-  | String(s) -> "new Stint (" ^ s ^ ")"
+  | String(s) -> "new Stint(" ^ s ^ ")"
   | Boolean(b) -> 
   		(match b with 
   			True -> "true"
@@ -40,52 +40,52 @@ let rec string_of_expr = function
   | UniOp(o, e1) ->
  	  (match  o with 
  	  	Not -> "!" ) ^ " " ^ string_of_expr e1
-  | StrOp (e1, o, e2) ->  
+  | StrOp(e1, o, e2) ->  
   		string_of_expr e1 ^ 
   		(match o with
 			Adds -> ".add(" ^ string_of_expr e2 ^ ")"
   			| Subs -> ".minus(" ^ string_of_expr e2 ^ ")"
   			| Eqs -> ".equals(" ^ string_of_expr e2 ^ ")"
   			| Neqs -> ".nonEquals(" ^ string_of_expr e2 ^ ")")
-  | StrOpAt (e1, o, e2, e3) ->
+  | StrOpAt(e1, o, e2, e3) ->
   		string_of_expr e1 ^
   		(match o with
   			Adds -> ".addAt(" ^ string_of_expr e2 ^ string_of_expr e3 ^ ")"
   			| Eqs-> ".minusAt(" ^ string_of_expr e2 ^ string_of_expr e3 ^ ")"
   			| Neqs -> ""
   			| Subs -> "") 
-  | Assign (s1, e2) ->
+  | Assign(s1, e2) ->
   		s1 ^ " = " ^ string_of_expr e2
-  | AssignStr (s1, e2) ->
+  | AssignStr(s1, e2) ->
   		s1 ^ " = " ^  string_of_expr e2
-  | AssignSet (s1, st, e1, e2) ->
+  | AssignSet(s1, st, e1, e2) ->
   		s1 ^ (match st with
   			SubChar -> ".setByIndex(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^")"
   			| SubInt -> ".setByInt(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^ ")"
   			| SubStr -> ".setByString(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^ ")")
-  | AssignRange (s1, e1, e2, e3) ->
+  | AssignRange(s1, e1, e2, e3) ->
       s1 ^ ".setByRange(" ^ string_of_expr e3 ^", "^ string_of_expr e1 ^", "^string_of_expr e2 ^")" 
-  | Extract (s, st, e) ->
+  | Extract(s, st, e) ->
   		s ^
   		(match st with
   			SubChar -> ".getSubstring(" ^ string_of_expr e ^")"
   			| SubInt -> ".getInt(" ^ string_of_expr e ^ ")"
   			| SubStr -> ".getString(" ^ string_of_expr e ^ ")")
-  | Sublen (s, e1, e2) ->
+  | Sublen(s, e1, e2) ->
   		s ^ ".getSubstring(" ^ string_of_expr e1 ^
   			" ," ^ string_of_expr e2 ^ ")"
-  | Chset (s,set, e) -> 
+  | Chset(s,set, e) -> 
   		s ^ 
   		(match set with 
   			Spl -> ".split(" ^ string_of_expr e
   			| Fnd -> ".getCount(" ^ string_of_expr e)
-  | RemoveSet (s, st, e) -> 
+  | RemoveSet(s, st, e) -> 
   		s ^ 
   		(match st with
   			SubChar -> ".removeInt(" ^ string_of_expr e ^ ")"
   			| SubInt -> ".removeInt(" ^ string_of_expr e ^ ")"
   			| SubStr -> ".removeInt(" ^ string_of_expr e ^")")
-  | RemoveStr (s, e1, e2) ->
+  | RemoveStr(s, e1, e2) ->
   		s ^ 
   		".remove(" ^ string_of_expr e1 ^"," ^ string_of_expr e2
   	
@@ -96,7 +96,7 @@ let rec string_of_expr = function
   			| Out -> "System.out.println(" ^ string_of_expr e ^ "); \n"
       )
     else (let str = string_of_expr e in
-          let temp = String.sub str 1 ((String.rindex str '.') - 1) in
+          let temp = String.sub str 10 ((String.rindex str '.') - 10) in
           (match s with
             In -> "String line_"^temp^"=null;\n
                 while (in_"^temp^".hasNextLine()) {\n
@@ -108,19 +108,16 @@ let rec string_of_expr = function
       )
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")\n"
-  
+  | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
   | NoExpr -> ""
   | Fop(fop, e) -> let str = string_of_expr e in
-          let temp = String.sub str 1 ((String.rindex str '.') - 1) in 
+          let temp = String.sub str 10 ((String.rindex str '.') - 10) in 
         (match fop with 
   			 Open -> "try { \n File file_" ^ temp ^ " = new File((" ^ string_of_expr e ^").toString());\n
-                  Scanner in_" ^ temp ^ " = new Scanner (file_" ^ temp ^ ");\n 
+                  Scanner in_" ^ temp ^ " = new Scanner(file_" ^ temp ^ ");\n 
                   PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp ^ "));" 
   			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_"^temp^".close();\n } \n 
                     catch (Exception e) { \n System.err.println (e); }\n" ) 
-  
-  | IntToStr (e) -> "new Stint (" ^ string_of_expr e ^ ")"
-  | BoolToStr (e) -> "new Stint (" ^ string_of_expr e ^ ")"
 
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
