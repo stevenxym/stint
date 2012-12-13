@@ -1,7 +1,7 @@
 module StringMap = Map.Make(String)
 
 type env = {
-        locals:         string StringMap.t;
+    locals:         string StringMap.t;
 	globals:        string StringMap.t;
 	functions:      string list StringMap.t;
 }
@@ -26,8 +26,9 @@ let add_global name v_type env =
 	if StringMap.mem name env.globals then StringMap.empty
 	else StringMap.add name v_type env.globals
 
-let add_function name v_type env =
+let add_function name return_type formals env =
 	if StringMap.mem name env.functions then StringMap.empty
 	(*raise (Failure ("function " ^ name ^ " is already defined"))*)
-	else StringMap.add name v_type env.functions
+	else let f = List.map (fun formal -> fst formal) formals in 
+	StringMap.add name return_type::f env.functions
 

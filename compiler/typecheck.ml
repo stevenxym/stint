@@ -225,8 +225,8 @@ let rec check_globals env globals =
 	| hd::tl -> (check_global env hd) :: (check_globals env tl)
 
 let check_function env func =
-	let env.locals = StringMap.empty in
-	let ret = add_function func.fname func.returnType env in
+	let env = {locals = StringMap.empty; globals = env.globals; functions = enn.functions } in
+	let ret = add_function func.fname func.returnType func.formals env in
 	if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
 	else {Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = (check_formals env func.formals); Sast.body = (check_stmt_list env func func.body)}
 
