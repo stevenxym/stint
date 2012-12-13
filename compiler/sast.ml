@@ -19,15 +19,15 @@ type expr_t =
 	| Assign of string * expr_t
 	| AssignStr of string * expr_t	(* assign value to string type *)
 	| AssignSet of string * subs_t * expr_t * expr_t     
+	| AssignRange of string * expr_t * expr_t* expr_t
 	| Extract of string * subs_t * expr_t
 	| Sublen of string * expr_t * expr_t
 	| Chset of string * sets_t * expr_t
 	| RemoveSet of string * subs_t * expr_t
-	| RemoveStr of string * expr_t * expr_t
+	| RemoveRange of string * expr_t * expr_t
 	| Stream of strm_t * string * expr_t
 	| Call of string * expr_t list
-	| IntToStr of expr_t		(* type convert *)
-	| BoolToStr of expr_t		(* type convert *)
+	| ToStr of expr_t		(* type convert *)
 	| Fop of fop_t * expr_t
 	| NoExpr
 

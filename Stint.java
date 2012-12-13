@@ -1,5 +1,13 @@
+import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+/***
+ * This class is used as a utility class for Stint language to replace the 
+ * original String class Java offers
+ * @author JohnWoo
+ *
+ */
 
 public class Stint{
 
@@ -16,6 +24,8 @@ public class Stint{
 	public Stint(String arg){
 		content=new StringBuilder();
 		content.append(arg);
+		integers=new TreeMap<Integer, Integer>();
+		strings=new TreeMap<Integer, String>();
 		update();
 	}
 
@@ -25,6 +35,10 @@ public class Stint{
 
 	public Stint(boolean arg){
 		this(arg?"true":"false");
+	}
+	
+	public Stint(Stint s){
+		this(s.toString());
 	}
 
 	/* NEVER call this directly */
@@ -49,11 +63,15 @@ public class Stint{
 	public Stint addAt(Stint s, int index){
 		String s1=this.toString();
 		String s2=s.toString();
-		if(s2.length()-1<index || index<0){
-			exception("Stint: Invalid Index");
+		if(s1.length()<index || index<0){
+			exception("Stint: Invalid Index: "+index);
 			return this;
 		}
-		return new Stint(s1.substring(0,index+1)+s2+s1.substring(index+1,s1.length()));
+		if(index==0)
+			return new Stint(s2+s1);
+		if(index==s1.length())
+			return new Stint(s1+s2);
+		return new Stint(s1.substring(0,index)+s2+s1.substring(index));
 	}
 
 	public Stint minus(Stint s){
@@ -161,7 +179,7 @@ public class Stint{
 		return this;
 	}
 
-	public Stint remove(int start, int length){
+	public Stint removeRange(int start, int length){
 		String temp=content.toString();
 		if(start==0)
 			temp=temp.substring(length);
@@ -169,6 +187,15 @@ public class Stint{
 		content=new StringBuilder();
 		content.append(temp);
 		update();
+		return this;
+	}
+	
+	public Stint removeChar(int index){
+		return removeRange(index,1);
+	}
+	
+	public Stint removeString(int index){
+		this.setByString(new Stint(),index);
 		return this;
 	}
 
@@ -235,28 +262,44 @@ public class Stint{
 
 	private void update(){
 		String temp=content.toString();
+		if(temp.length()==0)
+			return;
 		String[] ints=temp.split("[^0-9]+");
+		ArrayList<String> t=new ArrayList<String>();
+		for(String s:ints){
+			if(!s.equals(""))
+				t.add(s);
+		}
+		ints=new String[t.size()];
+		t.toArray(ints);
 		int index=0;
-		if(temp.startsWith(ints[0])){
+		if(ints.length>0 && temp.startsWith(ints[0])){
 			integers.put(0, Integer.parseInt(ints[0]));
-			index=3;
+			index=2;
 		}else{
 			index=1;
 		}
-		for(int i=0;i<ints.length;i++){
+		for(int i=(index==2?1:0);i<ints.length;i++){
 			integers.put(index, Integer.parseInt(ints[i]));
 			index=index+2;
 		}
 		
 		String[] strs=temp.split("[0-9]+");
+		t=new ArrayList<String>();
+		for(String s:strs){
+			if(!s.equals(""))
+				t.add(s);
+		}
+		strs=new String[t.size()];
+		t.toArray(strs);
 		index=0;
-		if(temp.startsWith(ints[0])){
+		if(strs.length>0 && temp.startsWith(strs[0])){
 			strings.put(0, strs[0]);
-			index=3;
+			index=2;
 		}else{
 			index=1;
 		}
-		for(int i=0;i<strs.length;i++){
+		for(int i=(index==2?1:0);i<strs.length;i++){
 			strings.put(index, strs[i]);
 			index=index+2;
 		}

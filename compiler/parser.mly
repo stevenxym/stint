@@ -120,7 +120,8 @@ expr:
 		| ID ASSIGN expr { Assign($1, $3) }
 		| ID LANGLE expr RANGLE ASSIGN expr { AssignSet($1, SubStr, $3, $6) }
 		| ID LPANGLE expr RANGLE ASSIGN expr { AssignSet($1, SubInt, $3, $6) }
-		| ID LBRACK expr COMMA expr RBRACK ASSIGN expr { AssignSet($1, SubStr, $3, $8) }
+		| ID LBRACK expr RBRACK ASSIGN expr {AssignSet($1, SubStr, $3, $6)}
+		| ID LBRACK expr COMMA expr RBRACK ASSIGN expr { AssignRange($1, $3, $5, $8) }
 
 		| ID SEARCH expr { Chset($1, Fnd, $3) }
 		| ID SPLIT expr { Chset($1, Spl, $3) }
@@ -128,7 +129,8 @@ expr:
 		/* ___Remove___ */
 		| RM ID LPANGLE expr RANGLE { RemoveSet($2, SubInt, $4) } 
 		| RM ID LANGLE expr RANGLE { RemoveSet($2, SubStr, $4) }
-		| RM ID LBRACK expr COMMA expr RBRACK { RemoveStr($2, $4, $6) }
+		| RM ID LBRACK expr RBRACK { RemoveSet($2, SubChar, $4) }
+		| RM ID LBRACK expr COMMA expr RBRACK { RemoveRange($2, $4, $6) }
 		/* ____Stream___ */
 		| LIT_STR CIN expr { Stream(In, $1, $3) }
 		| STD CIN expr { Stream(In, "std", $3) }
