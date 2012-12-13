@@ -24,7 +24,8 @@ type expr =
 	| Chset of string * sets * expr		(* change set *)
 	| RemoveSet of string * subs * expr	(* ~str<||>, ~str.<||> *)
 	| RemoveRange of string * expr * expr	(* ~str[,] *)
-	| Stream of strm * string * expr	(* io stream *)
+	| Stream of strm * expr * expr		(* normal io stream *)
+	| StreamStd of strm * expr		(* std io stream *)
 	| Call of string * expr list
 	| Fop of fop * expr
 	| Noexpr				(* for void arg list *)
@@ -62,28 +63,30 @@ let rec string_of_expr = function
       string_of_expr e2
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | AssignSet(v, s, e1, e2) -> v ^ 
-  								(match s with 
-  									SubChar -> "[" ^ string_of_expr e1 ^ "]"
-  									| SubInt -> ".<|" ^ string_of_expr e1 ^ "|>"
-  									| SubStr -> "<|" ^ string_of_expr e1 ^ "|>")
-  								^ " = " ^ string_of_expr e2
+  	(match s with 
+  		SubChar -> "[" ^ string_of_expr e1 ^ "]"
+  		| SubInt -> ".<|" ^ string_of_expr e1 ^ "|>"
+  		| SubStr -> "<|" ^ string_of_expr e1 ^ "|>")
+  		^ " = " ^ string_of_expr e2
   | AssignRange(v, i, l, e) -> v ^"["^ string_of_expr i ^","^ string_of_expr l^"]=" ^ string_of_expr e
   | Extract(v, s, e) -> v ^ (match s with 
-  									SubChar -> "[" ^ string_of_expr e ^ "]"
-  									| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
-  									| SubStr -> "<|" ^ string_of_expr e ^ "|>")
+  				SubChar -> "[" ^ string_of_expr e ^ "]"
+  				| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
+  				| SubStr -> "<|" ^ string_of_expr e ^ "|>")
   | Sublen(v, e1, e2) -> v ^ "[" ^ string_of_expr e1  ^ ", " ^ string_of_expr e2 ^ "]"
   | Chset(v, s, e) -> v ^ (match s with
-  								Spl -> " | "
-  								| Fnd -> " # ") ^ string_of_expr e
+  				Spl -> " | "
+  				| Fnd -> " # ") ^ string_of_expr e
   | RemoveSet(v, s, e) -> "~" ^ v ^ (match s with 
-  									SubChar -> "[" ^ string_of_expr e ^ "]"
-  									| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
-  									| SubStr -> "<|" ^ string_of_expr e ^ "|>")
+  				SubChar -> "[" ^ string_of_expr e ^ "]"
+  				| SubInt -> ".<|" ^ string_of_expr e ^ "|>"
+  				| SubStr -> "<|" ^ string_of_expr e ^ "|>")
   | RemoveRange(v, e1, e2) -> "~" ^ v ^ "[" ^ string_of_expr e1 ^ ", " ^ string_of_expr e2 ^ "]"
-  | Stream(s, v, e) ->  v ^ (match s with
-  						  In -> " >> "
-  						  | Out -> " << ") ^ string_of_expr e 
+  | Stream(s, v, e) ->  string_of_expr v ^ (match s with
+  				In -> " >> "
+  				| Out -> " << ") ^ string_of_expr e
+  | StreamStd(s, e) -> "std" ^ (match s with
+  				In -> " >> " | Out -> " << ") ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
