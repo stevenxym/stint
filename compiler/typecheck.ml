@@ -7,9 +7,9 @@ module StringMap = Map.Make(String)
  *  -> string if one of the two operands having string type
  *  -> int/boolean if both of the operands having the same type *)
 let get_expr_type t1 t2 =
-	if t1 == "string" || t2 == "string" then "string" else
-	if t1 == "int" && t2 == "int" then "int" else
-	if t1 == "boolean" && t2 == "boolean" then "boolean" else
+	if t1 = "string" || t2 = "string" then "string" else
+	if t1 = "int" && t2 = "int" then "int" else
+	if t1 = "boolean" && t2 = "boolean" then "boolean" else
 	raise (Failure ("type error"))
 
 (* mark int & boolean expression to string type *)
@@ -20,36 +20,36 @@ let conv_type = function
  * raise error if no name matching in variable list *)
 let get_vartype env id = 
 	let t = find_variable id env in
-	if t == "" then raise (Failure ("undefined variable " ^ id)) else t
+	if t = "" then raise (Failure ("undefined variable " ^ id)) else t
 
 let match_oper e1 op e2 =
 	let expr_t = get_expr_type (snd e1) (snd e2) in
 	(match op with
-	   Add -> if expr_t == "int" then (Sast.BinOp(fst e1, Sast.Add, fst e2), "int") else
-	   	  if expr_t == "string" then (Sast.StrOp(conv_type e1, Sast.Adds, conv_type e2), "string") else
+	   Add -> if expr_t = "int" then (Sast.BinOp(fst e1, Sast.Add, fst e2), "int") else
+	   	  if expr_t = "string" then (Sast.StrOp(conv_type e1, Sast.Adds, conv_type e2), "string") else
 		  raise (Failure ("type error"))
-	 | Sub -> if expr_t == "int" then (Sast.BinOp(fst e1, Sast.Sub, fst e2), "int") else
-	 	  if expr_t == "string" then (Sast.StrOp(conv_type e1, Sast.Subs, conv_type e2), "string") else
+	 | Sub -> if expr_t = "int" then (Sast.BinOp(fst e1, Sast.Sub, fst e2), "int") else
+	 	  if expr_t = "string" then (Sast.StrOp(conv_type e1, Sast.Subs, conv_type e2), "string") else
 		  raise (Failure ("type error"))
-	 | Mult -> if expr_t == "int" then (Sast.BinOp(fst e1, Sast.Mult, fst e2), "int") else
+	 | Mult -> if expr_t = "int" then (Sast.BinOp(fst e1, Sast.Mult, fst e2), "int") else
 	 	   raise (Failure ("type error"))
-	 | Div -> if expr_t == "int" then (Sast.BinOp(fst e1, Sast.Div, fst e2), "int") else
+	 | Div -> if expr_t = "int" then (Sast.BinOp(fst e1, Sast.Div, fst e2), "int") else
 		  raise (Failure ("type error"))
-	 | Equal -> if expr_t == "string" then (Sast.StrOp(conv_type e1, Sast.Eqs, conv_type e2), "boolean") else
+	 | Equal -> if expr_t = "string" then (Sast.StrOp(conv_type e1, Sast.Eqs, conv_type e2), "boolean") else
 	 	    (Sast.BinOp(fst e1, Sast.Equal, fst e2), "boolean")
-	 | Neq -> if expr_t == "string" then (Sast.StrOp(conv_type e1, Sast.Neqs, conv_type e2), "boolean") else
+	 | Neq -> if expr_t = "string" then (Sast.StrOp(conv_type e1, Sast.Neqs, conv_type e2), "boolean") else
 	 	  (Sast.BinOp(fst e1, Sast.Neq, fst e2), "boolean")
-	 | Less -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | Less -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	   (Sast.BinOp(fst e1, Sast.Less, fst e2), "boolean")
-	 | LessEq -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | LessEq -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	     (Sast.BinOp(fst e1, Sast.LessEq, fst e2), "boolean")
-	 | Grt -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | Grt -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	  (Sast.BinOp(fst e1, Sast.Grt, fst e2), "boolean")
-	 | GrtEq -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | GrtEq -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	    (Sast.BinOp(fst e1, Sast.GrtEq, fst e2), "boolean")
-	 | And -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | And -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	  (Sast.BinOp(fst e1, Sast.And, fst e2), "boolean")
-	 | Or -> if expr_t == "string" then raise (Failure ("type error")) else
+	 | Or -> if expr_t = "string" then raise (Failure ("type error")) else
 	 	 (Sast.BinOp(fst e1, Sast.Or, fst e2), "boolean")
 	)
 
@@ -85,7 +85,7 @@ let rec check_expr env = function
 	| Assign(id, e) ->
 		let t = get_vartype env id in
 		let expr = get_expr_with_type env e t in
-		if t == "string" then (Sast.AssignStr(id, (conv_type (expr,t))), t)
+		if t = "string" then (Sast.AssignStr(id, (conv_type (expr,t))), t)
 		else Sast.Assign(id, expr), t
 
 	| AssignSet(id, subs, i, e) ->
@@ -113,7 +113,7 @@ let rec check_expr env = function
 	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e)
 	| Call(func, e_list) -> Sast.Call(func, e_list)
 	| Fop(fop, e) -> Sast.Fop(fop, e)
-	| Noexpr -> Sast.Noexpr
+	| Noexpr -> (Sast.Noexpr, "void")
 
 (* get expr_t(sast type) by expr(ast type) with given type
  * raise error if the expression type does match requirement *)
@@ -127,7 +127,7 @@ let check_formal env formal =
 	let e = check_expr env expr in
 		if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
 	    else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
-        else if s1 == "string" && (snd e == "int" || snd e == "boolean") then (s1, s2, Sast.ToStr(fst e)) 
+        else if s1 = "string" && (snd e = "int" || snd e = "boolean") then (s1, s2, Sast.ToStr(fst e)) 
 	    else (s1, s2, fst e)
 
 let rec check_formals env formals = 
@@ -141,7 +141,7 @@ let rec check_stmt env func = function
 	| Decl(s1, s2, expr) -> let e = check_expr env expr in
 							if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
 	        				else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
-	        				else if s1 == "string" && (snd e == "int" || snd e == "boolean") then Sast.Decl(s1, s2, Sast.ToStr(fst e)) 
+	        				else if s1 = "string" && (snd e = "int" || snd e = "boolean") then Sast.Decl(s1, s2, Sast.ToStr(fst e)) 
 							else Sast.Decl(s1, s2, fst e)
 	| Expr(expr) -> fst (check_expr env expr)
 	| Return(expr) -> let e = check_expr env expr in
@@ -168,7 +168,7 @@ let check_global env global =
 let rec check_globals env globals = 
 	match globals with
 	  [] -> []
-	| hd:tl -> (check_global env hd) :: (check_globals env tl)
+	| hd::tl -> (check_global env hd) :: (check_globals env tl)
 
 let check_function env func =
 	let env.locals = StringMap.empty in
