@@ -160,7 +160,7 @@ let rec check_expr env = function
 			In -> Sast.StreamStd(Sast.In, check_string_id expr), "void"
 			| Out -> Sast.StreamStd(Sast.Out, conv_type expr), "void" )
 
-	| Call(func, e_list) -> Sast.Call(func, e_list)
+	| Call(func, e_list) ->
 	| Fop(fop, e) ->
 		let target = get_expr_with_type env e "string" in
 		( match fop with
