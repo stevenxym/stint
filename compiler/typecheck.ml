@@ -7,22 +7,16 @@ module StringMap = Map.Make(String)
  *  -> string if one of the two operands having string type
  *  -> int/boolean if both of the operands having the same type *)
 let get_expr_type t1 t2 =
-<<<<<<< HEAD
-	if t1 = "string" || t2 = "string" then "string" else
-	if t1 = "int" && t2 = "int" then "int" else
-	if t1 = "boolean" && t2 = "boolean" then "boolean" else
-====
 	if t1 = "void" || t2 = "void" then raise (Failure ("cannot use void type inside expression")) else
 	if t1 = "string" || t2 = "string" then "string" else
 	if t1 = "int" && t2 = "int" then "int" else
 	if t1 = "boolean" && t2 = "boolean" then "boolean" else
->>>>>>> 0f6c9aa8406826c59f0805240c8440789b0ab891
 	raise (Failure ("type error"))
 
 (* mark int & boolean expression to string type *)
 let conv_type = function 
 	(expr, t) -> if t = "void" then raise (Failure ("cannot use void type inside expression")) else
-		     if t != "string" then Sast.ToStr(expr) else expr
+		     if not(t = "string") then Sast.ToStr(expr) else expr
 
 (* get variable type according to the name
  * raise error if no name matching in variable list *)
@@ -32,7 +26,7 @@ let get_vartype env id =
 
 let check_string_id expr = 
 	let (e, t) = expr in
-	if t != "string" then raise (Failure ("type error")) else
+	if not(t = "string") then raise (Failure ("type error")) else
 	( match e with Sast.Id(i) -> e
 			| _ -> raise (Failure ("should use identifier")) )
 
@@ -92,7 +86,7 @@ let rec check_expr env = function
 		let fst_expr = check_expr env e1
 		and snd_expr = check_expr env e2
 		and position = get_expr_with_type env pos "int" in
-		if (get_expr_type (snd fst_expr) (snd snd_expr)) != "string" then raise (Failure ("type error"))
+		if not((get_expr_type (snd fst_expr) (snd snd_expr)) = "string") then raise (Failure ("type error"))
 
 		else match_str_oper fst_expr op snd_expr position
 
@@ -103,24 +97,24 @@ let rec check_expr env = function
 		else Sast.Assign(id, (get_expr_with_type env e t)), "void"
 
 	| AssignSet(id, subs, i, e) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else let index = get_expr_with_type env i "int"
 		     and expr = check_expr env e in
 		     ( match subs with
 			  SubChar -> Sast.AssignSet(id, Sast.SubChar, index, (conv_type expr)), "void"
-			| SubInt  -> if (snd expr) != "int" then raise (Failure ("type error"))
+			| SubInt  -> if not((snd expr) = "int") then raise (Failure ("type error"))
 				     else Sast.AssignSet(id, Sast.SubInt, index, (fst expr)), "void"
 			| SubStr  -> Sast.AssignSet(id, Sast.SubStr, index, (conv_type expr)), "void" )
 
 	| AssignRange(id, i, l, e) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else Sast.AssignRange(  id,
 					get_expr_with_type env i "int",
 					get_expr_with_type env l "int",
 					conv_type (check_expr env e)), "void"
 
 	| Extract(id, subs, i) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else let index = get_expr_with_type env i "int" in
 		     ( match subs with
 			  SubChar -> Sast.Extract(id, Sast.SubChar, index), "string"
@@ -128,20 +122,20 @@ let rec check_expr env = function
 			| SubStr  -> Sast.Extract(id, Sast.SubStr, index), "string" )
 
 	| Sublen(id, i, l) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else Sast.Sublen( id,
 				  get_expr_with_type env i "int",
 				  get_expr_with_type env l "int"), "string"
 
 	| Chset(id, sets, s) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else let str = get_expr_with_type env s "string" in
 		     ( match sets with
 			  Spl -> Sast.Chset(id, Sast.Spl, str), "int"
 			| Fnd -> Sast.Chset(id, Sast.Fnd, str), "int" )
 			
 	| RemoveSet(id, subs, i) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else let index = get_expr_with_type env i "int" in
 		     ( match subs with
 			  SubChar -> Sast.RemoveSet(id, Sast.SubChar, index), "void"
@@ -149,7 +143,7 @@ let rec check_expr env = function
 			| SubStr -> Sast.RemoveSet(id, Sast.SubStr, index), "void" )
 
 	| RemoveRange(id, i, l) ->
-		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		if not((get_vartype env id) = "string") then raise (Failure ("type error"))
 		else Sast.RemoveRange(  id,
 					get_expr_with_type env i "int",
 					get_expr_with_type env l "int"), "void"
@@ -179,13 +173,13 @@ let rec check_expr env = function
  * raise error if the expression type does match requirement *)
 and get_expr_with_type env expr t = 
 	let e = check_expr env expr in
-	if (snd e) != t then raise (Failure ("type error")) else (fst e)
+	if not((snd e) = t) then raise (Failure ("type error")) else (fst e)
 
 
 let check_formal env formal = 
 	let (s1, s2, expr) = formal in
 	let e = check_expr env expr in
-		if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
+		if not(snd e = s1) && not(snd e = "void") && not(s1 = "string") then raise (Failure ("type error"))
 	    else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
         else if s1 = "string" && (snd e = "int" || snd e = "boolean") then (s1, s2, Sast.ToStr(fst e)) 
 	    else (s1, s2, fst e)
@@ -199,19 +193,19 @@ let rec check_formals env formals =
 let rec check_stmt env func = function
 	  Block(stmt_list) -> Sast.Block(check_stmt_list env func stmt_list)
 	| Decl(s1, s2, expr) -> let e = check_expr env expr in
-							if snd e != s1 && snd e != "void" && s1 != "string" then raise (Failure ("type error"))
+							if not(snd e = s1) && not(snd e = "void") && not(s1 = "string") then raise (Failure ("type error"))
 	        				else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
 	        				else if s1 = "string" && (snd e = "int" || snd e = "boolean") then Sast.Decl(s1, s2, Sast.ToStr(fst e)) 
 							else Sast.Decl(s1, s2, fst e)
 	| Expr(expr) -> fst (check_expr env expr)
 	| Return(expr) -> let e = check_expr env expr in
-					  if (snd e != func.returnType) then raise (Failure ("The return type doesn't match!"))
+					  if not(snd e = func.returnType) then raise (Failure ("The return type doesn't match!"))
 					  else Sast.Return(fst e) 
 	| If(expr, stmt1, stmt2) ->	let e = check_expr env expr in 
-								if snd e != "boolean" then raise (Failure ("The type of the condition in If statement must be boolean!")) 
+								if not(snd e = "boolean") then raise (Failure ("The type of the condition in If statement must be boolean!")) 
 								else Sast.If(fst e, (check_stmt env func stmt1), (check_stmt func env stmt2))	(* if() {} else{} *)
 	| While(expr, stmt) -> let e = check_expr env expr in
-						   if snd e != "boolean" then raise (Failure ("The type of the condition in While statement must be boolean!"))
+						   if not (snd e = "boolean") then raise (Failure ("The type of the condition in While statement must be boolean!"))
 						   else Sast.While(fst e, (check_stmt env func stmt))				(* while() {} *)
 	| Break -> Sast.Break
 
