@@ -7,6 +7,7 @@ module StringMap = Map.Make(String)
  *  -> string if one of the two operands having string type
  *  -> int/boolean if both of the operands having the same type *)
 let get_expr_type t1 t2 =
+	if t1 == "void" || t2 == "void" then raise (Failure ("cannot use void type inside expression")) else
 	if t1 == "string" || t2 == "string" then "string" else
 	if t1 == "int" && t2 == "int" then "int" else
 	if t1 == "boolean" && t2 == "boolean" then "boolean" else
@@ -14,13 +15,20 @@ let get_expr_type t1 t2 =
 
 (* mark int & boolean expression to string type *)
 let conv_type = function 
-	(expr, t) -> if t != "string" then Sast.ToStr(expr) else expr
+	(expr, t) -> if t == "void" then raise (Failure ("cannot use void type inside expression")) else
+		     if t != "string" then Sast.ToStr(expr) else expr
 
 (* get variable type according to the name
  * raise error if no name matching in variable list *)
 let get_vartype env id = 
 	let t = find_variable id env in
 	if t == "" then raise (Failure ("undefined variable " ^ id)) else t
+
+let check_string_id expr = 
+	let (e, t) = expr in
+	if t != "string" then raise (Failure ("type error")) else
+	( match e with Sast.Id(i) -> e
+			| _ -> raise (Failure ("should use identifier")) )
 
 let match_oper e1 op e2 =
 	let expr_t = get_expr_type (snd e1) (snd e2) in
@@ -83,36 +91,82 @@ let rec check_expr env = function
 
 	| Assign(id, e) ->
 		let t = get_vartype env id in
-		let expr = get_expr_with_type env e t in
-		if t == "string" then (Sast.AssignStr(id, (conv_type (expr,t))), t)
-		else Sast.Assign(id, expr), t
+		if t == "string" then 
+		     Sast.AssignStr(id, (conv_type (check_expr env e))), "void"
+		else Sast.Assign(id, (get_expr_with_type env e t)), "void"
 
 	| AssignSet(id, subs, i, e) ->
 		if (get_vartype env id) != "string" then raise (Failure ("type error"))
 		else let index = get_expr_with_type env i "int"
 		     and expr = check_expr env e in
 		     ( match subs with
-			  SubChar -> Sast.AssignSet(id, Sast.SubChar, index, (conv_type expr)), "string"
+			  SubChar -> Sast.AssignSet(id, Sast.SubChar, index, (conv_type expr)), "void"
 			| SubInt  -> if (snd expr) != "int" then raise (Failure ("type error"))
-				     else Sast.AssignSet(id, Sast.SubInt, index, (fst expr)), "int"
-			| SubStr  -> Sast.AssignSet(id, Sast.SubStr, index, (conv_type expr)), "string" )
+				     else Sast.AssignSet(id, Sast.SubInt, index, (fst expr)), "void"
+			| SubStr  -> Sast.AssignSet(id, Sast.SubStr, index, (conv_type expr)), "void" )
 
 	| AssignRange(id, i, l, e) ->
 		if (get_vartype env id) != "string" then raise (Failure ("type error"))
 		else Sast.AssignRange(  id,
 					get_expr_with_type env i "int",
 					get_expr_with_type env l "int",
-					conv_type (check_expr env e)), "string"
+					conv_type (check_expr env e)), "void"
 
-	| Extract(id, subs, i) -> Sast.Extract(id, subs, i)
-	| Sublen(id, i, len) -> Sast.Sublen(id, i, len)
-	| Chset(id, sets, str) -> Sast.Chset(id, sets, str)
-	| RemoveSet(id, subs, i) -> Sast.RemoveSet(id, subs, i)
-	| RemoveRange(id, i, len) -> Sast.RemoveStr(id, i, len)
-	| Stream(strm, dest, e) -> Sast.Stream(strm, dest, e)
+	| Extract(id, subs, i) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else let index = get_expr_with_type env i "int" in
+		     ( match subs with
+			  SubChar -> Sast.Extract(id, Sast.SubChar, index), "string"
+			| SubInt  -> Sast.Extract(id, Sast.SubInt, index), "int"
+			| SubStr  -> Sast.Extract(id, Sast.SubStr, index), "string" )
+
+	| Sublen(id, i, l) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else Sast.Sublen( id,
+				  get_expr_with_type env i "int",
+				  get_expr_with_type env l "int"), "string"
+
+	| Chset(id, sets, s) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else let str = get_expr_with_type env s "string" in
+		     ( match sets with
+			  Spl -> Sast.Chset(id, Sast.Spl, str), "int"
+			| Fnd -> Sast.Chset(id, Sast.Fnd, str), "int" )
+			
+	| RemoveSet(id, subs, i) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else let index = get_expr_with_type env i "int" in
+		     ( match subs with
+			  SubChar -> Sast.RemoveSet(id, Sast.SubChar, index), "void"
+			| SubInt -> Sast.RemoveSet(id, Sast.SubInt, index), "void"
+			| SubStr -> Sast.RemoveSet(id, Sast.SubStr, index), "void" )
+
+	| RemoveRange(id, i, l) ->
+		if (get_vartype env id) != "string" then raise (Failure ("type error"))
+		else Sast.RemoveRange(  id,
+					get_expr_with_type env i "int",
+					get_expr_with_type env l "int"), "void"
+	| Stream(strm, dest, e) ->
+		let target = get_expr_with_type env dest "string"
+		and expr = check_expr env e in
+		( match strm with
+			In -> Sast.Stream(Sast.In, target, check_string_id expr), "void"
+			| Out -> Sast.Stream(Sast.Out, target, conv_type expr), "void" )
+
+	| StreamStd(strm, e) ->
+		let expr = check_expr env e in
+		( match strm with
+			In -> Sast.StreamStd(Sast.In, check_string_id expr), "void"
+			| Out -> Sast.StreamStd(Sast.Out, conv_type expr), "void" )
+
 	| Call(func, e_list) -> Sast.Call(func, e_list)
-	| Fop(fop, e) -> Sast.Fop(fop, e)
-	| Noexpr -> Sast.Noexpr
+	| Fop(fop, e) ->
+		let target = get_expr_with_type env e "string" in
+		( match fop with
+			Open -> Sast.Fop(Sast.Open, target), "void"
+			| Close -> Sast.Fop(Sast.Close, target), "void" )
+
+	| Noexpr -> Sast.Noexpr, "void"
 
 (* get expr_t(sast type) by expr(ast type) with given type
  * raise error if the expression type does match requirement *)

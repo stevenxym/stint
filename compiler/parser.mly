@@ -132,10 +132,10 @@ expr:
 		| RM ID LBRACK expr RBRACK { RemoveSet($2, SubChar, $4) }
 		| RM ID LBRACK expr COMMA expr RBRACK { RemoveRange($2, $4, $6) }
 		/* ____Stream___ */
-		| LIT_STR CIN expr { Stream(In, $1, $3) }
-		| STD CIN expr { Stream(In, "std", $3) }
-		| LIT_STR COUT expr { Stream(Out, $1, $3) }
-		| STD COUT expr { Stream(Out, "std", $3) }
+		| expr CIN expr { Stream(In, $1, $3) }
+		| STD CIN expr { StreamStd(In, $3) }
+		| expr COUT expr { Stream(Out, $1, $3) }
+		| STD COUT expr { StreamStd(Out, $3) }
 
 		| ID LPAREN actuals_opt RPAREN { Call($1, $3) }
 		| LPAREN expr RPAREN { $2 }

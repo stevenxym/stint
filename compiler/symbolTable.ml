@@ -3,7 +3,7 @@ module StringMap = Map.Make(String)
 type env = {
         locals:         string StringMap.t;
 	globals:        string StringMap.t;
-	functions:      string StringMap.t;
+	functions:      string list StringMap.t;
 }
 
 let find_variable name env = 
@@ -14,7 +14,7 @@ let find_variable name env =
 
 let find_function name env = 
 	try StringMap.find name env.functions
-	with Not_found -> ""
+	with Not_found -> []
 	(*raise (Failure ("undefined function " ^ name)) *)
 
 let add_local name v_type env =
