@@ -1,7 +1,7 @@
 open Sast
 
 let depth = ref 0
-let f_counter = ref 0
+(*let f_counter = ref 0*)
 
 let rec tabs_helper = function
 	0 -> ""
@@ -10,7 +10,7 @@ let rec tabs_helper = function
 let rec tabs = function
 	0 -> tabs_helper depth.contents
 	| x -> ""
-
+(*
 let java_bop = function
 	Add -> "+" | Sub -> "-" | Mult -> "*" | Div-> "/" 
 	| Equal -> "==" | Neq -> "!=" | Less -> "<"| LessEq -> "<="
@@ -21,7 +21,7 @@ let java_uop = function
 
 let java_sop = function
 	Adds -> "add" | Subs -> "minus" | Eqs -> "euqals" | Neqs -> "nonEquals"
-
+*)
 let rec string_of_expr = function
     Integer(i) -> string_of_int i
   | String(s) -> "new Stint(\"" ^ s ^ "\")"
@@ -89,20 +89,23 @@ let rec string_of_expr = function
   		s ^ 
   		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")"
   	
-  | Stream(s, v, e) ->  if v = "std" then 
-      (match s with
-  			In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
-  			| Out -> "System.out.println((" ^ string_of_expr e ^ ").toString())"
-      )
-    else (let temp = String.sub v 0 (String.rindex v '.')  in
+  | Stream(s, e1, e2) ->  
+      (let str = string_of_expr e1 in
+          let temp = String.sub str 10 ((String.rindex str '.') - 10) in
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
                 "while (in_"^ temp ^".hasNextLine()) {\n
-                "^ string_of_expr e ^" = new Stint( in_"^ temp ^".nextLine());\n
-                System.out.println("^ string_of_expr e ^".toString());\n }"
-            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e ^").toString())"
+                "^ string_of_expr e2 ^" = new Stint( in_"^ temp ^".nextLine());\n
+                System.out.println("^ string_of_expr e2 ^".toString());\n }"
+            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e2 ^").toString())"
           )
       )
+  | StreamStd(s, e) ->
+      (match s with
+        In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
+        | Out -> "System.out.println((" ^ string_of_expr e ^ ").toString())"
+      )
+   
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
@@ -112,13 +115,17 @@ let rec string_of_expr = function
         (match fop with 
   			 Open -> "try { \n File file_" ^ temp ^ " = new File((" ^ string_of_expr e ^").toString());\n
                   Scanner in_" ^ temp ^ " = new Scanner(file_" ^ temp ^ ");\n 
-                  PrintWriter pwriter_"^ temp^"= new PrintWriter(new FileWriter(file_" ^ temp ^ "))" 
-  			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_"^temp^".close();\n } \n 
+                  PrintWriter pwriter_" ^ temp ^ "= new PrintWriter(new FileWriter(file_" ^ temp ^ "))" 
+  			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_" ^ temp ^ ".close();\n } \n 
                     catch (Exception e) { \n System.err.println (e); }\n" ) 
+
+let string_of_var = function
+    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
+      else "Stint" ^" "^ s2 ^ " = " ^ string_of_expr e ^ ";\n")
 
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
-  | Decl(str1, str2, expr) -> tabs 0 ^ str1 ^ " " ^ str2 ^ " = " ^ string_of_expr expr ^ ";\n"
+  | Decl(str1, str2, expr) -> tabs 0 ^ string_of_var (str1, str2, expr)
   | Expr(expr) -> tabs 0 ^ string_of_expr expr ^ ";\n"
   | Return(expr) -> tabs 0 ^ "return " ^ string_of_expr expr ^ ";\n"
   | If(e, s, Block([])) -> tabs 0 ^ "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
@@ -132,23 +139,24 @@ and string_of_block (sl) =
 	let s = s ^ String.concat "" (List.map string_of_stmt sl) in
 	depth := depth.contents - 1; s ^ tabs 0 ^ "}\n\n"
 
-let string_of_formals = function
-  	(f, s, l) -> f ^ s ^ string_of_expr l 
+let string_of_formal = function
+  (s1, s2, e) -> (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 ^ string_of_expr e
+      else "Stint" ^" "^ s2 ^ string_of_expr e)
+
+let string_of_formal_list = function
+[] -> ""
+| formals -> String.concat ", " (List.map string_of_formal formals)
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
     else (if fdecl.returnType = "int" || fdecl.returnType = "bool" then fdecl.returnType else "Stint" )
-          ^ " " ^ fdecl.fname ^ "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n" 
+          ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
     )
   	^ string_of_block  fdecl.body
 
 let java_func_list = function
 	[] -> ""
 	|funcs -> String.concat "\n" (List.map string_of_fdecl funcs)
-
-let string_of_var = function
-  	(s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
-      else "Stint" ^" "^ s2 ^ " = " ^ string_of_expr e ^ ";\n")
 
 let rec java_var_list = function
 	[] -> ""
