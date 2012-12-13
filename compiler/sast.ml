@@ -30,7 +30,7 @@ type expr_t =
 	| Call of string * expr_t list
 	| ToStr of expr_t		(* type convert *)
 	| Fop of fop_t * expr_t
-	| NoExpr
+	| Noexpr
 
 type stmt_t = 
 	  Block of stmt_t list

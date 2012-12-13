@@ -109,7 +109,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
-  | NoExpr -> ""
+  | Noexpr -> ""
   | Fop(fop, e) -> let str = string_of_expr e in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in 
         (match fop with 
