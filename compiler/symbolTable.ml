@@ -26,8 +26,7 @@ let add_global name v_type env =
 	if StringMap.mem name env.globals then StringMap.empty
 	else StringMap.add name v_type env.globals
 
-let add_function name v_type env =
+let add_function name ret_t formals env =
 	if StringMap.mem name env.functions then StringMap.empty
-	(*raise (Failure ("function " ^ name ^ " is already defined"))*)
-	else StringMap.add name v_type env.functions
+	else StringMap.add name ret_t::(List.fold_left ) env.functions
 

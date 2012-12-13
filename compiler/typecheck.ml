@@ -30,6 +30,14 @@ let check_string_id expr =
 	( match e with Sast.Id(i) -> e
 			| _ -> raise (Failure ("should use identifier")) )
 
+(* check the expression type can be used for
+ * the corresponding argument according to definition
+ * return the new expression list in expr_t for sast *)
+let check_func_arg lst (expr, expr_t) arg_t =
+	if arg_t = "string" then (conv_type expr) :: lst else
+	if expr_t = arg_t then expr :: lst else
+	raise (Failure("unmatched argument type"))
+
 let match_oper e1 op e2 =
 	let expr_t = get_expr_type (snd e1) (snd e2) in
 	(match op with
@@ -160,7 +168,14 @@ let rec check_expr env = function
 			In -> Sast.StreamStd(Sast.In, check_string_id expr), "void"
 			| Out -> Sast.StreamStd(Sast.Out, conv_type expr), "void" )
 
-	| Call(func, e_list) ->
+	| Call(func, el) ->
+		let args = find_function func env in	(* return & arguments type list from definition *)
+		( match args with
+			[] -> raise (Failure ("undefined function " ^ func))
+			| hd::tl -> let new_list = try List.fold_left2 check_arg_type [] (List.map (check_expr env) el) tl
+						   with Invalid_argument -> raise(Failure("unmatched argument list"))
+				    in Sast.Call(func, List.rev new_list ), hd )
+
 	| Fop(fop, e) ->
 		let target = get_expr_with_type env e "string" in
 		( match fop with
