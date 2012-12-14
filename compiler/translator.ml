@@ -1,7 +1,6 @@
 open Sast
 
 let depth = ref 0
-(*let f_counter = ref 0*)
 
 let rec tabs_helper = function
 	0 -> ""
@@ -10,21 +9,10 @@ let rec tabs_helper = function
 let rec tabs = function
 	0 -> tabs_helper depth.contents
 	| x -> ""
-(*
-let java_bop = function
-	Add -> "+" | Sub -> "-" | Mult -> "*" | Div-> "/" 
-	| Equal -> "==" | Neq -> "!=" | Less -> "<"| LessEq -> "<="
-	| Grt -> ">" | GrtEq -> ">=" | And -> "&&" | Or -> "||"
 
-let java_uop = function
-	Not -> "!" 
-
-let java_sop = function
-	Adds -> "add" | Subs -> "minus" | Eqs -> "euqals" | Neqs -> "nonEquals"
-*)
 let rec string_of_expr = function
     Integer(i) -> string_of_int i
-  | String(s) -> "new Stint(\"" ^ s ^ "\")"
+  | String(s) -> "new Stint(" ^ s ^ ")"
   | Boolean(b) -> 
   		(match b with 
   			True -> "true"
@@ -35,7 +23,7 @@ let rec string_of_expr = function
       (match o with
 		    Add -> "+" | Sub -> "-" | Mult -> "*" | Div -> "/"
       	| Equal -> "==" | Neq -> "!=" | Less -> "<" | LessEq -> "<=" 
-      	| Grt -> ">" | GrtEq -> ">=" | And -> "&&" | Or -> "||"   ) 
+      	| Grt -> ">" | GrtEq -> ">=" | And -> "&&" | Or -> "||" ) 
       ^ " " ^ string_of_expr e2
   | UniOp(o, e1) ->
  	  (match  o with 
@@ -57,7 +45,7 @@ let rec string_of_expr = function
   | Assign(s1, e2) ->
   		s1 ^ " = " ^ string_of_expr e2
   | AssignStr(s1, e2) ->
-  		s1 ^ " = " ^  string_of_expr e2
+  		s1 ^ " = new Stint (" ^ string_of_expr e2 ^ ")"
   | AssignSet(s1, st, e1, e2) ->
   		s1 ^ (match st with
   			SubChar -> ".setByIndex(" ^ string_of_expr e2 ^", "^ string_of_expr e1 ^")"
@@ -87,8 +75,7 @@ let rec string_of_expr = function
   			| SubStr -> ".removeString(" ^ string_of_expr e ^")")
   | RemoveRange(s, e1, e2) ->
   		s ^ 
-  		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")"
-  	
+  		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")" 	
   | Stream(s, e1, e2) ->  
       (let str = string_of_expr e1 in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in
@@ -104,8 +91,7 @@ let rec string_of_expr = function
       (match s with
         In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
         | Out -> "System.out.println((" ^ string_of_expr e ^ ").toString())"
-      )
-   
+      )  
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
@@ -140,8 +126,8 @@ and string_of_block (sl) =
 	depth := depth.contents - 1; s ^ tabs 0 ^ "}\n\n"
 
 let string_of_formal = function
-  (s1, s2, e) -> (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 ^ string_of_expr e
-      else "Stint" ^" "^ s2 ^ string_of_expr e)
+  (s1, s2, e) -> (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 
+      else "Stint" ^" "^ s2 )
 
 let string_of_formal_list = function
 [] -> ""
@@ -158,10 +144,9 @@ let java_func_list = function
 	[] -> ""
 	|funcs -> String.concat "\n" (List.map string_of_fdecl funcs)
 
-let rec java_var_list = function
+let java_var_list = function
 	[] -> ""
 	| vars -> (String.concat "" (List.map string_of_var vars))
-
 
 let rec to_java (vars_t, funcs_t) =
 	depth := 0; 
