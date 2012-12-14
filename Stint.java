@@ -89,10 +89,11 @@ public class Stint implements Cloneable{
 	public Stint minusAt(Stint s, int index){
 		String s1=this.toString().substring(index);
 		String s2=s.toString();
+		String s3=(index==0?null:this.toString().substring(0,index));
 		if(s1.indexOf(s2)==-1)
 			return this;
 		else{
-			return new Stint(s1.replaceFirst(s2, ""));
+			return new Stint(s3+s1.replaceFirst(s2, ""));
 		}
 	}
 
