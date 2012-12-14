@@ -238,6 +238,8 @@ let rec check_stmt env func = function
 
 and check_stmt_list env func = function 
 	  [] -> []
+	| [s] -> (match s with Return(expr) -> [fst (check_stmt env func s)]
+						| _ -> raise (Failure ("The last statement must be return statement")))
 	| hd::tl -> let s,e = (check_stmt env func hd) in s::(check_stmt_list e func tl)
 
 let check_global env global =
