@@ -62,8 +62,8 @@ public class Utility {
 	
 	private static void updateIO(File f, Stint s){
 		try {
-			Scanner sc=new Scanner(f);
 			PrintWriter pw=new PrintWriter(f);
+			Scanner sc=new Scanner(f);
 			scanners.put(s.toString(),sc);
 			printers.put(s.toString(),pw);
 		} catch (FileNotFoundException e) {
