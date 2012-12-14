@@ -195,10 +195,11 @@ and get_expr_with_type env expr t =
 let check_formal env formal = 
 	let (t, name, expr) = formal in
 	let ret = add_local name t env in
+	let env = {locals = ret; globals = env.globals; functions = env.functions } in
 	if t = "void" then raise (Failure("cannot use void as variable type")) else
 	if StringMap.is_empty ret then raise (Failure ("local variable " ^ name ^ " is already defined"))
 	else ( match expr with
-		Noexpr -> t, name, Sast.Noexpr
+		Noexpr -> (t, name, Sast.Noexpr), env
 		| _ -> raise(Failure("cannot assign value inside function definition")) )
 	(*let e = check_expr env expr i
 		if not(snd e = s1) && not(snd e = "void") && not(s1 = "string") then raise (Failure ("type error"))
@@ -210,55 +211,58 @@ let check_formal env formal =
 let rec check_formals env formals = 
 	match formals with 
 	  [] -> []
-	| hd::tl -> (check_formal env hd) :: (check_formals env tl) 
+	| hd::tl -> let f, e = (check_formal env hd) in f::(check_formals e tl) 
 
 
 let rec check_stmt env func = function
-	  Block(stmt_list) -> Sast.Block(check_stmt_list env func stmt_list)
+	  Block(stmt_list) -> (Sast.Block(check_stmt_list env func stmt_list)), env
 	| Decl(s1, s2, expr) -> let e = check_expr env expr in
-				(*modified: 1. check s1 cannot be void; 2. expr cannot be void because it will be assigned to variable *)
-				if s1 = "void" || (snd e) = "void" then raise (Failure("cannot use void as variable type")) else
+				(*modified: 1. check s1 cannot be void; 2. expr can be void*)
+							if s1 = "void" then raise (Failure("cannot use void as variable type")) else
 							if not(snd e = s1) && not(snd e = "void") && not(s1 = "string") then raise (Failure ("type error"))
-	        				else let ret = add_local s2 s1 env in if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
-	        				else if s1 = "string" && (snd e = "int" || snd e = "boolean") then Sast.Decl(s1, s2, Sast.ToStr(fst e)) 
-							else Sast.Decl(s1, s2, fst e)
-	| Expr(expr) -> Sast.Expr(fst (check_expr env expr))
+	        				else let ret = add_local s2 s1 env in let env = {locals = ret; globals = env.globals; functions = env.functions } in
+	        				if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
+	        				else if s1 = "string" && (snd e = "int" || snd e = "boolean") then (Sast.Decl(s1, s2, Sast.ToStr(fst e))), env 
+							else (Sast.Decl(s1, s2, fst e)), env
+	| Expr(expr) -> (Sast.Expr(fst (check_expr env expr))), env
 	| Return(expr) -> let e = check_expr env expr in
 					  if not(snd e = func.returnType) then raise (Failure ("The return type doesn't match!"))
-					  else Sast.Return(fst e) 
+					  else (Sast.Return(fst e)), env 
 	| If(expr, stmt1, stmt2) ->	let e = check_expr env expr in 
 								if not(snd e = "boolean") then raise (Failure ("The type of the condition in If statement must be boolean!")) 
-								else Sast.If(fst e, (check_stmt env func stmt1), (check_stmt env func stmt2))	(* if() {} else{} *)
+								else (Sast.If(fst e, fst (check_stmt env func stmt1), fst (check_stmt env func stmt2))), env	(* if() {} else{} *)
 	| While(expr, stmt) -> let e = check_expr env expr in
 						   if not (snd e = "boolean") then raise (Failure ("The type of the condition in While statement must be boolean!"))
-						   else Sast.While(fst e, (check_stmt env func stmt))				(* while() {} *)
-	| Break -> Sast.Break
+						   else (Sast.While(fst e, fst (check_stmt env func stmt))), env				(* while() {} *)
+	| Break -> (Sast.Break), env
 
 and check_stmt_list env func = function 
 	  [] -> []
-	| hd::tl -> (check_stmt env func hd) :: (check_stmt_list env func tl)
+	| hd::tl -> let s,e = (check_stmt env func hd) in s::(check_stmt_list e func tl)
 
 let check_global env global =
 	let (v_type, name, expr) = global in
 	let ret = add_global name v_type env in
+	let env = {locals = env.locals; globals = ret; functions = env.functions } in
 	if StringMap.is_empty ret then raise (Failure ("global variable " ^ name ^ " is already defined"))
-	else (v_type, name, (check_expr env expr))
+	else (v_type, name, fst (check_expr env expr)), env
 
 let rec check_globals env globals = 
 	match globals with
 	  [] -> []
-	| hd::tl -> (check_global env hd) :: (check_globals env tl)
+	| hd::tl -> let g, e = (check_global env hd) in g::(check_globals e tl)
 
 let check_function env func =
 	let env = {locals = StringMap.empty; globals = env.globals; functions = env.functions } in
 	let ret = add_function func.fname func.returnType func.formals env in
+	let env = {locals = env.locals; globals = env.globals; functions = ret } in
 	if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
-	else {Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = (check_formals env func.formals); Sast.body = (check_stmt_list env func func.body)}
+	else {Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = (check_formals env func.formals); Sast.body = (check_stmt_list env func func.body)}, env
 
 let rec check_functions env funcs = 
 	match funcs with
 	  [] -> []
-	| hd::tl -> (check_function env hd) :: (check_functions env tl) 
+	| hd::tl -> let f, e = (check_function env hd) in f::(check_functions e tl) 
 
 
 let check_program (globals, funcs) = 
@@ -267,3 +271,5 @@ let check_program (globals, funcs) =
 			functions = StringMap.empty }
 	in
 	((check_globals env globals), (check_functions env funcs))
+
+
