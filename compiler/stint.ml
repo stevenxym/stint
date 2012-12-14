@@ -13,5 +13,5 @@ let _ =
            in print_string listing
     | Sast -> let listing = Sast.string_of_program_t program_t
     	   in print_string listing
-    | Java -> let listing = Translator.to_java program_t
+    | Java -> let listing = Translator.to_java program_t Sys.argv(2)
           in print_string listing
