@@ -10,7 +10,7 @@ OBJ_LEX = scanner.ml
 OBJ_YACC = parser.mli parser.ml
 
 stint: $(OBJS)
-	ocamlc -o stint $(OBJS)
+	ocamlc -o stint unix.cma $(OBJS)
 
 $(OBJ_LEX): scanner.mll
 	ocamllex scanner.mll

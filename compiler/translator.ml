@@ -149,7 +149,7 @@ let java_var_list = function
 	| vars -> (String.concat "" (List.map string_of_var vars))
 
 let to_java (vars_t, funcs_t) name =
-  let temp = String.sub name 0 ((String.rindex name '.') - 0) in 
-	depth := 0; 
-	"import java.util.Scanner;\n import java.io.*; \n import java.io.IOException; \n\n class "^ temp ^ "{ \n" 
-	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t ^ "\n }"
+ 	depth := 0; 
+	"import java.util.Scanner;\n import java.io.*; \n import java.io.IOException; \n\n class "^ name ^ "{ \n" 
+	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t ^ "\n }" 
+  
