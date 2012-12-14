@@ -9,7 +9,7 @@ import java.util.TreeMap;
  *
  */
 
-public class Stint{
+public class Stint implements Cloneable{
 
 	StringBuilder content;
 	TreeMap<Integer,Integer> integers;
@@ -36,7 +36,7 @@ public class Stint{
 	public Stint(boolean arg){
 		this(arg?"true":"false");
 	}
-	
+
 	public Stint(Stint s){
 		this(s.toString());
 	}
@@ -74,23 +74,25 @@ public class Stint{
 		return new Stint(s1.substring(0,index)+s2+s1.substring(index));
 	}
 
+	//Not Tested
 	public Stint minus(Stint s){
 		String s1=this.toString();
 		String s2=s.toString();
 		if(s1.indexOf(s2)==-1)
 			return this;
 		else{
-			return new Stint(s1.replaceAll(s2, ""));
+			return new Stint(s1.replaceFirst(s2,""));
 		}
 	}
 
+	//Not Tested
 	public Stint minusAt(Stint s, int index){
 		String s1=this.toString().substring(index);
 		String s2=s.toString();
 		if(s1.indexOf(s2)==-1)
 			return this;
 		else{
-			return new Stint(s1.replaceAll(s2, ""));
+			return new Stint(s1.replaceFirst(s2, ""));
 		}
 	}
 
@@ -117,10 +119,14 @@ public class Stint{
 		int t=0;
 		int key=0;
 		for(Integer i:integers.keySet()){
-			if(t==index)
+			if(t==index){
 				key=i;
+				break;
+			}
 			else t++;
 		}
+		if(t!=index)
+			exception("Stint: Invalid Index");
 		return integers.get(key);
 	}
 
@@ -132,10 +138,14 @@ public class Stint{
 			int t=0;
 			int key=0;
 			for(Integer i:strings.keySet()){
-				if(t==index)
+				if(t==index){
 					key=i;
+					break;
+				}
 				else t++;
 			}
+			if(t!=index)
+				exception("Stint: Invalid Index");
 			return new Stint(strings.get(key));
 		}else if(spliter!=null){
 			String[] temp=this.toString().split(spliter);
@@ -147,6 +157,7 @@ public class Stint{
 		}
 	}
 
+	//Function not Tested
 	public int split(Stint s){
 		spliter=s.toString();
 		chooser=null;
@@ -156,25 +167,29 @@ public class Stint{
 	public int getCount(Stint s){
 		chooser=s.toString();
 		spliter=null;
-		return this.toString().split(chooser).length-1;
+		return this.toString().split(chooser).length;
 	}
 
 	public Stint removeInt(int index){
 		if(index>integers.size()-1)
-			exception("Stint: Invalid Index");
+			exception("Stint: Invalid Index: "+index);
 		else{
 			int t=0;
 			int key=0;
 			for(Integer i:integers.keySet()){
-				if(t==index)
+				if(t==index){
 					key=i;
+					break;
+				}
 				else t++;
 			}
+			if(t!=index)
+				return this;
 			integers.remove(key);
 			reBuild();
-			content=new StringBuilder();
-			content.append(key);
-			update();
+			//			content=new StringBuilder();
+			//			content.append(key);
+			//			update();
 		}
 		return this;
 	}
@@ -189,11 +204,11 @@ public class Stint{
 		update();
 		return this;
 	}
-	
+
 	public Stint removeChar(int index){
 		return removeRange(index,1);
 	}
-	
+
 	public Stint removeString(int index){
 		this.setByString(new Stint(),index);
 		return this;
@@ -206,11 +221,15 @@ public class Stint{
 		}
 		int t=0;
 		int key=0;
-		for(Integer i:integers.keySet()){
-			if(t==index)
+		for(Integer i:strings.keySet()){
+			if(t==index){
 				key=i;
+				break;
+			}
 			else t++;
 		}
+		if(t!=index)
+			return;
 		strings.remove(key);
 		strings.put(key,s.toString());
 		reBuild();
@@ -219,8 +238,17 @@ public class Stint{
 	//a[index]=s
 	public void setByIndex(Stint s, int index){
 		String temp=content.toString();
-		if(index==0)
+		if(index==0){
 			temp=s.toString()+temp.substring(1);
+			content=new StringBuilder();
+			content.append(temp);
+		}
+		else if(index==content.length()-1){
+			temp=temp.substring(0,content.length()-1);
+			temp=temp+s.toString();
+			content=new StringBuilder();
+			content.append(temp);
+		}
 		else{
 			String left=content.substring(0,index);
 			String right=content.substring(index+1);
@@ -236,12 +264,16 @@ public class Stint{
 			exception("Stint: Invalid Index");
 		}
 		int t=0;
-		int key=0;
+		int key=-1;
 		for(Integer i:integers.keySet()){
-			if(t==index)
+			if(t==index){
 				key=i;
+				break;
+			}
 			else t++;
 		}
+		if(t!=index || key==-1)
+			return;
 		integers.remove(key);
 		integers.put(key,value);
 		reBuild();
@@ -260,7 +292,12 @@ public class Stint{
 
 	/* Below are private methods for the maintaince of internal structure */
 
+	public Stint clone(){
+		return new Stint(content.toString());
+	}
+
 	private void update(){
+		chooser=null;
 		String temp=content.toString();
 		if(temp.length()==0)
 			return;
@@ -283,7 +320,7 @@ public class Stint{
 			integers.put(index, Integer.parseInt(ints[i]));
 			index=index+2;
 		}
-		
+
 		String[] strs=temp.split("[0-9]+");
 		t=new ArrayList<String>();
 		for(String s:strs){
@@ -306,6 +343,7 @@ public class Stint{
 	}
 
 	private String reBuild(){
+		chooser=null;
 		TreeMap<Integer, String> temp=new TreeMap<Integer, String>();
 		for(Entry<Integer, String> e:strings.entrySet()){
 			temp.put(e.getKey(), e.getValue());

@@ -97,7 +97,127 @@ public class StintTester {
 		log("@ADD CHECK PASSED",true);
 	}
 
+	public static void checkGet(){
+		log("@SUBSTRING CHECK BEGIN",true);
+		try{
+			for(int i=0;i<cases.size();i++){
+				log(">>> "+cases.get(i).toString()+" >>>",false);
+				for(int j=0;j<cases.get(i).toString().length();j++){
+					Stint s2=cases.get(i).getSubstring(j);
+					log(s2.toString(),false);
+					s2=cases.get(i).getSubstring(j,cases.get(i).toString().length()-j);
+					log(s2.toString(),false);
+					if(j<cases.get(i).integers.size()){
+						int s1=cases.get(i).getInt(j);
+						log(s1+"",false);
+					}
+					if(j<cases.get(i).strings.size()){
+						s2=cases.get(i).getString(j);
+						log(s2.toString(),false);
+					}
+					log("----",false);
+				}
+			}
+		}catch(Exception e){
+			log("@SUBSTRING CHECK FAILED",true);
+			e.printStackTrace();
+			return;
+		}
+		log("@SUBSTRING CHECK PASSED",true);
+	}
 	
+	public static void checkRemove(){
+		log("@REMOVE CHECK BEGIN",true);
+		try{
+			Stint s=cases.get(8).clone();
+			log(">>> "+s.toString()+" >>>",false);
+			s.removeInt(0);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.removeInt(1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			log(s.toString(),false);
+			s.removeRange(0,1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.removeRange(2,1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.removeString(1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s=cases.get(8).clone();
+			s.removeChar(1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			
+		}catch(Exception e){
+			log("@REMOVE CHECK FAILED",true);
+			e.printStackTrace();
+			return;
+		}
+		log("@REMOVE CHECK PASSED",true);
+	}
+
+	public static void checkSet(){
+		log("@SET CHECK BEGIN",true);
+		try{
+			Stint s=cases.get(8).clone();
+			log(">>> "+s.toString()+" >>>",false);
+			s.setByString(new Stint("~"),0);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByString(new Stint("~"),1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByString(new Stint("~"),2);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByString(new Stint("4444"),0);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			log("----",false);
+			for(int i=0;i<cases.size();i++){
+				log(">>> "+cases.get(i).toString()+" >>>",false);
+				for(int j=0;j<cases.get(i).toString().length();j++){
+					s=cases.get(i).clone();
+					s.setByIndex(new Stint("~"),j);
+					log(s.toString(),false);
+				}
+			}
+			log("----",false);
+			s=cases.get(8).clone();
+			log(">>> "+s.toString()+" >>>",false);
+			s.setByInt(9999,0);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByInt(9999,1);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByInt(9999,2);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			s.setByInt(0,0);
+			log(s.toString(),false);
+			s=cases.get(8).clone();
+			log("----",false);
+			for(int i=0;i<cases.size();i++){
+				log(">>> "+cases.get(i).toString()+" >>>",false);
+				for(int j=0;j<cases.get(i).toString().length()-1;j++){
+					s=cases.get(i).clone();
+					s.setByRange(new Stint("~"),j,2);
+					log(s.toString(),false);
+				}
+			}
+			
+		}catch(Exception e){
+			log("@SET CHECK FAILED",true);
+			e.printStackTrace();
+			return;
+		}
+		log("@SET CHECK PASSED",true);
+	}
 
 	public static void main(String[] args){
 		init();
@@ -109,6 +229,12 @@ public class StintTester {
 		checkAdd();
 		log("",false);
 		checkAddAt();
+		log("",false);
+		checkGet();
+		log("",false);
+		checkRemove();
+		log("",false);
+		checkSet();
 	}
 
 	public static void log(String m,boolean sw){
