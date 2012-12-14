@@ -2,10 +2,10 @@ open Unix
 
 type action = Ast | Sast | Java | Class | Help | Version
 
-let version (n:unit) =
+let version =
   "Stint version 1.0 \"12/18/12\" \n "
 
-let usage (name:string) =
+let usage =
   "Usage: ./stint <option> <source file>\n where possible options include: \n" ^
     "        -a file.sti       (Output the AST of source file)\n" ^
     "        -s file.sti       (Output the SAST of source file)\n" ^
@@ -13,7 +13,6 @@ let usage (name:string) =
     "        -c file.sti       (Compile source code to .java and .class files)\n" ^
     "        -help             (Print a synopsis of standard options )\n" ^
     "        -version          (Display version information)\n"
-
 let _ =
   let action = 
     if Array.length Sys.argv > 1 then
@@ -27,8 +26,8 @@ let _ =
     else Help in
 
     match action with
-      Help -> print_endline (usage Sys.argv.(0))
-    | Version -> print_endline (version ())
+      Help -> print_endline (usage)
+    | Version -> print_endline (version)
     | (Ast | Sast | Java | Class) ->
       let fname = Sys.argv.(2) in 
       let index = String.rindex fname '.' in 
