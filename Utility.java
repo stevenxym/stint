@@ -54,8 +54,8 @@ public class Utility {
 			}
 			return false;
 		}catch(Exception e){
-			exception("Stint: IO Exception");
 			e.printStackTrace();
+			exception("Stint: IO Exception");
 		}
 		return false;
 	}
@@ -67,8 +67,8 @@ public class Utility {
 			scanners.put(s.toString(),sc);
 			printers.put(s.toString(),pw);
 		} catch (FileNotFoundException e) {
-			exception("Stint: IO Exception");
 			e.printStackTrace();
+			exception("Stint: IO Exception");
 		}
 		
 	}
