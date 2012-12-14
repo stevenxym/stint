@@ -77,14 +77,16 @@ let rec string_of_expr = function
   		s ^ 
   		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")" 	
   | Stream(s, e1, e2) ->  
-      (let str = string_of_expr e1 in
-          let temp = String.sub str 10 ((String.rindex str '.') - 10) in
+     (* (let str = string_of_expr e1 in
+          let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "while (in_"^ temp ^".hasNextLine()) {\n
+                "in = new Scanner (Utility.getFile(" ^ string_of_expr e1 ^ ")); \n
+                while (in_"^ temp ^".hasNextLine()) {\n
                 "^ string_of_expr e2 ^" = new Stint( in_"^ temp ^".nextLine());\n
                 System.out.println("^ string_of_expr e2 ^".toString());\n }"
-            | Out -> "pwriter_"^temp^".print((" ^ string_of_expr e2 ^").toString())"
+            | Out -> "pwriter = new PrintWriter(new FileWriter(Utility.getFile(" ^string_of_expr e1 ^ "));\n
+                      pwriter.print((" ^ string_of_expr e2 ^").toString())"
           )
       )
   | StreamStd(s, e) ->
@@ -96,12 +98,12 @@ let rec string_of_expr = function
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
   | Noexpr -> ""
-  | Fop(fop, e) -> let str = string_of_expr e in
-          let temp = String.sub str 10 ((String.rindex str '.') - 10) in 
+  | Fop(fop, e) -> (* let str = string_of_expr e in
+          let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
         (match fop with 
-  			 Open -> "try { \n File file_" ^ temp ^ " = new File((" ^ string_of_expr e ^").toString());\n
-                  Scanner in_" ^ temp ^ " = new Scanner(file_" ^ temp ^ ");\n 
-                  PrintWriter pwriter_" ^ temp ^ "= new PrintWriter(new FileWriter(file_" ^ temp ^ "))" 
+  			 Open -> "try { \n 
+                  Scanner in = new Scanner(Utility.getFile(" ^ string_of_expr e ^"));\n 
+                  PrintWriter pwriter = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ ")))" 
   			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_" ^ temp ^ ".close();\n } \n 
                     catch (Exception e) { \n System.err.println (e); }\n" ) 
 
