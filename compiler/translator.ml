@@ -38,10 +38,10 @@ let rec string_of_expr = function
   | StrOpAt(e1, o, e2, e3) ->
   		string_of_expr e1 ^
   		(match o with
-  			Adds -> ".addAt(" ^ string_of_expr e2 ^ string_of_expr e3 ^ ")"
-  			| Eqs-> ".minusAt(" ^ string_of_expr e2 ^ string_of_expr e3 ^ ")"
+  			Adds -> ".addAt(" ^ string_of_expr e2 ^", "^ string_of_expr e3 ^ ")"
+  			| Subs-> ".minusAt(" ^ string_of_expr e2 ^", "^ string_of_expr e3 ^ ")"
   			| Neqs -> ""
-  			| Subs -> "") 
+  			| Eqs -> "") 
   | Assign(s1, e2) ->
   		s1 ^ " = " ^ string_of_expr e2
   | AssignStr(s1, e2) ->
@@ -65,7 +65,7 @@ let rec string_of_expr = function
   | Chset(s,set, e) -> 
   		s ^ 
   		(match set with 
-  			Spl -> ".split(" ^ string_of_expr e
+  			Spl -> ".split(" ^ string_of_expr e ^ ")"
   			| Fnd -> ".getCount(" ^ string_of_expr e^")")
   | RemoveSet(s, st, e) -> 
   		s ^ 
@@ -90,7 +90,7 @@ let rec string_of_expr = function
   | StreamStd(s, e) ->
       (match s with
         In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
-        | Out -> "System.out.println((" ^ string_of_expr e ^ ").toString())"
+        | Out -> "System.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -106,7 +106,7 @@ let rec string_of_expr = function
                     catch (Exception e) { \n System.err.println (e); }\n" ) 
 
 let string_of_var = function
-    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
+    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
       else "Stint" ^" "^ s2 ^ " = " ^ string_of_expr e ^ ";\n")
 
 let rec string_of_stmt = function
@@ -126,7 +126,7 @@ and string_of_block (sl) =
 	depth := depth.contents - 1; s ^ tabs 0 ^ "}\n\n"
 
 let string_of_formal = function
-  (s1, s2, e) -> (if s1 = "int" || s1 = "bool" then s1 ^ " " ^ s2 
+  (s1, s2, e) -> (if s1 = "int" || s1 = "boolean" then s1 ^ " " ^ s2 
       else "Stint" ^" "^ s2 )
 
 let string_of_formal_list = function
@@ -135,7 +135,7 @@ let string_of_formal_list = function
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
-    else (if fdecl.returnType = "int" || fdecl.returnType = "bool" then fdecl.returnType else "Stint" )
+    else (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
           ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
     )
   	^ string_of_block  fdecl.body

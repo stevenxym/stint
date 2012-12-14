@@ -1,5 +1,0 @@
-void main(){
-	if (open "data.txt"){ std << "File is opened successfully.\n";}
-	else { std << "Open file failed.\n";}
-	return 0;
-}
