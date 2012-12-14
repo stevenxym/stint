@@ -5,7 +5,7 @@
 
 OBJS = scanner.cmo parser.cmo				\
 	ast.cmo sast.cmo symboltable.cmo typecheck.cmo	\
-	stint.cmo translator.cmo
+	translator.cmo stint.cmo
 OBJ_LEX = scanner.ml
 OBJ_YACC = parser.mli parser.ml
 
@@ -38,8 +38,8 @@ cleanall:
 #sast.cmx:
 #symboltable.cmo:
 #symboltable.cmx:
-stint.cmo: scanner.cmo parser.cmi ast.cmo typecheck.cmo
-stint.cmx: scanner.cmx parser.cmx ast.cmx typecheck.cmx
+stint.cmo: scanner.cmo parser.cmi ast.cmo typecheck.cmo translator.cmo
+stint.cmx: scanner.cmx parser.cmx ast.cmx typecheck.cmx translator.cmx
 typecheck.cmo: symboltable.cmo ast.cmo sast.cmo
 typecheck.cmx: symboltable.cmx ast.cmx sast.cmx
 parser.cmo: ast.cmo parser.cmi
@@ -48,3 +48,4 @@ scanner.cmo: parser.cmi
 scanner.cmx: parser.cmx
 parser.cmi: ast.cmo
 translator.cmo: sast.cmo
+translator.cmx: sast.cmx
