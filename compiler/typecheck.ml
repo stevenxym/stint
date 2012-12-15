@@ -71,8 +71,8 @@ let match_oper e1 op e2 =
 
 let match_str_oper e1 op e2 pos =
 	match op with
-	  Add -> (Sast.StrOpAt((fst e1), Sast.Adds, (fst e2), pos), "string")
-	  | Sub -> (Sast.StrOpAt((fst e1), Sast.Subs, (fst e2), pos), "string")
+	  Add -> (Sast.StrOpAt((conv_type e1), Sast.Adds, (conv_type e2), pos), "string")
+	  | Sub -> (Sast.StrOpAt((conv_type e1), Sast.Subs, (conv_type e2), pos), "string")
 	  | _ -> raise (Failure ("type error"))
 
 let rec check_expr env = function
