@@ -102,8 +102,8 @@ let rec string_of_expr = function
   			 | Close -> "if (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
 
 let string_of_var = function
-    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
-      else "Stint" ^" "^ s2 ^ " = " ^ string_of_expr e ^ ";\n")
+    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";" else " = "^ string_of_expr e ^ ";\n")
+       
 
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
