@@ -40,6 +40,34 @@ public class Utility {
 		}
 	}
 	
+	public static boolean read(Stint filename, Stint dest){
+		try{
+			Scanner sc=getScanner(filename);
+			if(sc.hasNextLine()){
+				dest=new Stint(sc.nextLine());
+				return true;
+			}else
+				return false;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public static boolean read(Stint dest){
+		try{
+			Scanner sc=new Scanner(System.in);
+			if(sc.hasNextLine()){
+				dest=new Stint(sc.nextLine());
+				return true;
+			}else
+				return false;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	public static boolean close(Stint s){
 		try{
 			if(files.containsKey(s.toString())){
