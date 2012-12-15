@@ -229,7 +229,7 @@ let rec check_stmt env func = function
 	| Return(expr) -> let e = check_expr env expr in
 					  if not(snd e = func.returnType) then raise (Failure ("The return type doesn't match!"))
 					  else (Sast.Return(fst e)), env 
-	| If(expr, stmt1, stmt2) ->	let e = check_expr env expr in 
+	| If(expr, stmt1, stmt2) ->	let e = check_expr env expr in
 								if not(snd e = "boolean") then raise (Failure ("The type of the condition in If statement must be boolean!")) 
 								else (Sast.If(fst e, fst (check_stmt env func stmt1), fst (check_stmt env func stmt2))), env	(* if() {} else{} *)
 	| While(expr, stmt) -> let e = check_expr env expr in

@@ -131,7 +131,7 @@ let string_of_formal_list = function
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
-    else "static" ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
+    else "static " ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
           ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
     )
   	^ string_of_block  fdecl.body

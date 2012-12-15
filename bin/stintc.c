@@ -134,11 +134,18 @@ static char *getln_from_file(FILE *fp)
 	if (len == 0)
 		return buff;
 
-	if (buff[len - 1] != '\n' && !feof(fp)) {
-		printf("line is too long!\n");
-		exit(EXIT_FAILURE);
-	} else
-		buff[len - 1] = 0;
+	if (!feof(fp)) {
+		if (buff[len - 1] != '\n') {
+			printf("line is too long!\n");
+			exit(EXIT_FAILURE);
+		} else
+			buff[len - 1] = 0;
+	} else {
+
+		if (buff[len - 1] == '\n')
+			buff[len - 1] = 0;
+
+	}
 	/*do {
 		if (buff)
 			free(buff);
@@ -283,12 +290,12 @@ static void __run_compiler(char *name, char *option)
 {
 	int pid;
 	int err = 0;
-	char *buff[4];
+	char *buff[4] = {"stint", option, name, NULL};
 
-	buff[0] = strdup("stint");
-	buff[1] = strdup(option);
-	buff[2] = strdup(name);
-	buff[3] = NULL;
+	//buff[0] = strdup("stint");
+	//buff[1] = strdup(option);
+	//buff[2] = strdup(name);
+	//buff[3] = NULL;
 
 	pid = fork();
 	if (pid != 0)
@@ -306,10 +313,10 @@ static void __run_java(char *name, char *out)
 {
 	int pid;
 	int err = 0;
-	char *buff[5];
+	char *buff[3] = {"java", name, NULL};
 
-	buff[0] = strdup("java");
-	buff[1] = strdup(name);
+	//buff[0] = strdup("java");
+	//buff[1] = strdup(name);
 
 	/*if (out) {
 		buff[2] = strdup(">");
@@ -567,8 +574,9 @@ static int run_testcase(struct command *cmd)
 		strcpy(name_buff, cmd->f_list[i]);
 		conv_file_name(name_buff, EXP_FILE);
 		strcat(exp_name, name_buff);
-		do_diff(exp_name, out_name);
-		count++;
+		if (do_diff(exp_name, out_name) >= 0)
+			count++;
+		free(out_name);
 	}
 
 	printf("---------\n");
