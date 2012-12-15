@@ -6,6 +6,8 @@ int fib (int x)
 	else{ 
 		return fib(x-1) + fib(x-2);
 	}
+
+	return 0; 
 }
 
 void main()
@@ -21,4 +23,5 @@ void main()
 	std << fib(4);
 	std << "\n";
 	std << fib(5);
+	return;
 }

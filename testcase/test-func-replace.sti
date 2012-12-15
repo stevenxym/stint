@@ -8,4 +8,5 @@ void main()
 	{
 		std << dest;
 	}
+	return;
 }
