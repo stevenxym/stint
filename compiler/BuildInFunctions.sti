@@ -1,5 +1,5 @@
 string readFile(string filename){
-	string s="";
+	string s;
 	filename >> s;
 	return s;
 }
