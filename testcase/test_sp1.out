@@ -1,0 +1,10 @@
+2, 0, 2, 0
+abc124edf455gh
+---
+3, 1, 4, 1
+abc126edf453gh
+---
+4, 2, 6, 1
+abc129edf450gh
+---
+result: str is abc129edf450gh, base is 4, iter is 3

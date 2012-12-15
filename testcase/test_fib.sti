@@ -1,18 +1,24 @@
 int fib (int x)
 {
+	int tmp;
 	if (x < 2){
-		return 1;
+		tmp = 1;
 	}
 	else{ 
-		return fib(x-1) + fib(x-2);
+		tmp = fib(x-1) + fib(x-2);
 	}
 
-	return 0; 
+	return tmp;
 }
 
 void main()
 {
-	std << fib(0);
+	int i = 0;
+	while (i <= 5) {
+		std << fib(i) +  "\n";
+		i = i + 1;
+	}
+/*	std << fib(0);
 	std << "\n";
 	std << fib(1);
 	std << "\n";
@@ -22,6 +28,6 @@ void main()
 	std << "\n";
 	std << fib(4);
 	std << "\n";
-	std << fib(5);
+	std << fib(5);*/
 	return;
 }

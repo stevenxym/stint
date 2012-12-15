@@ -128,7 +128,7 @@ let string_of_formal_list = function
 [] -> ""
 | formals -> String.concat ", " (List.map string_of_formal formals)
 
-let string_of_fdecl fdecl = tabs 0 ^
+let string_of_fdecl fdecl = tabs 0 ^ 
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
     else "static " ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
           ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
