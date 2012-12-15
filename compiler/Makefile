@@ -28,9 +28,8 @@ $(OBJ_YACC): parser.mly
 clean:
 	rm -rf *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output
 cleanall:
-	rm -rf *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output stint
-
-
+	rm -rf *.cmo *cmi $(OBJ_LEX) $(OBJ_YACC) parser.output	\
+	stint *.class *.ans Test*.java
 
 #ast.cmi:
 #ast.cmx:
