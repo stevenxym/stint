@@ -81,9 +81,8 @@ let rec string_of_expr = function
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "in = Utility.getScanner(" ^ string_of_expr e1 ^ "); \n
-                while (in.hasNextLine()) {\n  "^ string_of_expr e2 ^" = new Stint(in.nextLine());\n System.out.println("^ string_of_expr e2 ^".toString());\n }"
-            | Out -> "pwriter = Utility.getWriter(" ^string_of_expr e1 ^ ");\n pwriter.print((" ^ string_of_expr e2 ^").toString())"
+                "\twhile (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n  "^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n System.out.println("^ string_of_expr e2 ^".toString());\n }"
+            | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").print((" ^ string_of_expr e2 ^").toString())"
           )
       
   | StreamStd(s, e) ->
@@ -98,8 +97,8 @@ let rec string_of_expr = function
   | Fop(fop, e) -> (* let str = string_of_expr e in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
         (match fop with 
-  			 Open -> "try { \n\tUtility.getFile(" ^ string_of_expr e ^");\n\tScanner in;\n\tPrintWriter pwriter;\n" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
-  			 | Close -> "if (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
+  			 Open -> "\ttry { \n\tUtility.getFile(" ^ string_of_expr e ^");\n" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
+  			 | Close -> "\tif (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
 
 let string_of_var = function
     (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";\n\t" else " = "^ string_of_expr e ^ ";\n")
@@ -131,7 +130,7 @@ let string_of_formal_list = function
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
-    else "static" ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
+    else "static " ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
           ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
     )
   	^ string_of_block  fdecl.body
