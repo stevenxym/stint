@@ -256,18 +256,24 @@ let rec check_globals env globals =
 	| hd::tl -> let g, e = (check_global env hd) in (g, e)::(check_globals e tl)
 
 let check_function env func =
-	let env = {locals = StringMap.empty; globals = env.globals; functions = env.functions } in
-	let ret = add_function func.fname func.returnType func.formals env in
-	if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
-	else let env = {locals = env.locals; globals = env.globals; functions = ret } in
-	let f = check_formals env func.formals in
-	let formals = List.map (fun formal -> fst formal) f in
-	match f with
-	[] -> let body = check_stmt_list env func func.body in
-		{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, env
-	| _ -> 	let e = snd (List.hd (List.rev f)) in
-		let body = check_stmt_list e func func.body in
-		{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, e
+	if List.length func.body = 0 then raise (Failure ("The last statement must be return statement"))
+	else 
+	match List.hd (List.rev func.body) with
+	  Return(_) ->
+	  	let env = {locals = StringMap.empty; globals = env.globals; functions = env.functions } in
+		let ret = add_function func.fname func.returnType func.formals env in
+		if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
+		else let env = {locals = env.locals; globals = env.globals; functions = ret } in
+		let f = check_formals env func.formals in
+		let formals = List.map (fun formal -> fst formal) f in
+		(match f with
+		[] -> let body = check_stmt_list env func func.body in
+			{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, env
+		| _ -> 	let e = snd (List.hd (List.rev f)) in
+			let body = check_stmt_list e func func.body in
+			{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, e )
+	  | _ -> raise (Failure ("The last statement must be return statement"))
+
 
 
 let rec check_functions env funcs = 
