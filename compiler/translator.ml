@@ -80,14 +80,14 @@ let rec string_of_expr = function
      (* (let str = string_of_expr e1 in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
-            In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "\tif (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"}"
+            In -> "\tUtility.read("^ string_of_expr e1 ^", "^string_of_expr e2^")"
+                (*"\tif (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"}"*)
             | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").write((" ^ string_of_expr e2 ^").toString())"
           )
       
   | StreamStd(s, e) ->
       (match s with
-        In -> "\tScanner in = new Scanner(System.in);\n\t"^tabs 0 ^ string_of_expr e ^ " = new Stint( in.next() )"
+        In -> "Utility.read("^ string_of_expr e ^ ")"
         | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
