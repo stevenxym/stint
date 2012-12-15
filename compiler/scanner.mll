@@ -27,7 +27,7 @@ rule token = parse
 	| "if"			{ IF }			| "else"	{ ELSE }
 	| "while"		{ WHILE }		| "return"	{ RETURN }
 	| "open"		{ OPEN }		| "close"	{ CLOSE }
-	| "break"		{ BREAK }		| "eof" 	{ END }
+	| "break"		{ BREAK }
 	| "void"		{ VOID }		| "std"		{ STD }
 	| "true"		{ TRUE }		| "false"	{ FALSE }
 	| eof			{ EOF }			(* do as microC *)

@@ -159,13 +159,13 @@ let rec check_expr env = function
 		let target = get_expr_with_type env dest "string"
 		and expr = check_expr env e in
 		( match strm with
-			In -> Sast.Stream(Sast.In, target, check_string_id expr), "void"
+			In -> Sast.Stream(Sast.In, target, check_string_id expr), "boolean"
 			| Out -> Sast.Stream(Sast.Out, target, conv_type expr), "void" )
 
 	| StreamStd(strm, e) ->
 		let expr = check_expr env e in
 		( match strm with
-			In -> Sast.StreamStd(Sast.In, check_string_id expr), "void"
+			In -> Sast.StreamStd(Sast.In, check_string_id expr), "boolean"
 			| Out -> Sast.StreamStd(Sast.Out, conv_type expr), "void" )
 
 	| Call(func, el) ->

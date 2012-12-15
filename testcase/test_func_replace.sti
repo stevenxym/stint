@@ -4,7 +4,7 @@ void main()
 	string s= "a";
 	string r= "d";
 
-	if (replaceAll (dest, s, r))
+	if (replaceAll (dest, s, r) != "")
 	{
 		std << dest;
 	}
