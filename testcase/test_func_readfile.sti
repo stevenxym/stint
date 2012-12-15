@@ -4,7 +4,7 @@ void main()
 	open filename;
 	string str;
 
-	while ((str = ReadFile(filename)) != eof)
+	while ((str = readFile(filename)) != eof)
 	{
 		std << str;
 	}

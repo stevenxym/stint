@@ -98,7 +98,7 @@ let rec string_of_expr = function
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
         match fop with 
   			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
-  			 | Close -> let s = tabs 0 ^"if (Utility.close(" ^ string_of_expr e ^ ")) \n\t"^tabs 0 ^"System.out.print(\"Close file successfully.\");\n\t} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
+  			 | Close -> let s = tabs 0 ^"if (Utility.close(" ^ string_of_expr e ^ ")) \n\t}"^tabs 0 ^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
                     in depth := depth.contents - 1; s^tabs 0^"\t\t}"
                   
 

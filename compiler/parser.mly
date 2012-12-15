@@ -4,7 +4,6 @@
 %token ASSIGN PLUS MINUS TIMES DIVIDE EQ NEQ LESS LEQ GRT GEQ			  	/* general operators */
 %token AT SPLIT SEARCH RM NOT AND OR COUT CIN					/* type-specified operators */
 %token INT STR BOOL IF ELSE WHILE RETURN OPEN CLOSE BREAK EOF VOID TRUE FALSE STD	/* key word */
-%token END					/* don't know whether need it */
 %token <int> LIT_INT
 %token <string> LIT_STR
 %token <string> ID
@@ -14,8 +13,8 @@
 %nonassoc NOAT
 %nonassoc AT
 
-%nonassoc COUT CIN
 %right ASSIGN			/* =, <<, >> */
+%nonassoc COUT CIN
 %left OPEN CLOSE
 %left EQ NEQ			/* ==, != */
 %left LESS LEQ GRT GEQ		/* <, <=, >, >= */
