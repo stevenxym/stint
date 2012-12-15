@@ -1,6 +1,6 @@
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -9,7 +9,7 @@ public class Utility {
 
 	static HashMap<String, File> files= new HashMap<String, File>();
 	static HashMap<String, Scanner> scanners=new HashMap<String, Scanner>();
-	static HashMap<String, PrintWriter> printers=new HashMap<String, PrintWriter>();
+	static HashMap<String, FileWriter> printers=new HashMap<String, FileWriter>();
 	
 	public static File getFile(Stint s){
 		if(files.containsKey(s.toString())){
@@ -31,7 +31,7 @@ public class Utility {
 		}
 	}
 	
-	public static PrintWriter getWriter(Stint s){
+	public static FileWriter getWriter(Stint s){
 		if(printers.containsKey(s.toString())){
 			return printers.get(s.toString());
 		}else{
@@ -62,11 +62,11 @@ public class Utility {
 	
 	private static void updateIO(File f, Stint s){
 		try {
-			PrintWriter pw=new PrintWriter(f);
+			FileWriter fw=new FileWriter(f,true);
 			Scanner sc=new Scanner(f);
 			scanners.put(s.toString(),sc);
-			printers.put(s.toString(),pw);
-		} catch (FileNotFoundException e) {
+			printers.put(s.toString(),fw);
+		} catch (IOException e) {
 			e.printStackTrace();
 			exception("Stint: IO Exception");
 		}

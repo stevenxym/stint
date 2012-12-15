@@ -81,13 +81,13 @@ let rec string_of_expr = function
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "\twhile (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n  "^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n System.out.println("^ string_of_expr e2 ^".toString());\n }"
-            | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").print((" ^ string_of_expr e2 ^").toString())"
+                "\twhile (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"System.out.println("^ string_of_expr e2 ^".toString());\n\t"^tabs 0 ^"}"
+            | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").write((" ^ string_of_expr e2 ^").toString())"
           )
       
   | StreamStd(s, e) ->
       (match s with
-        In -> "\tScanner in = new Scanner(System.in);\n\t" ^ string_of_expr e ^ " = new Stint( in.next() )"
+        In -> "\tScanner in = new Scanner(System.in);\n\t"^tabs 0 ^ string_of_expr e ^ " = new Stint( in.next() )"
         | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
@@ -96,14 +96,15 @@ let rec string_of_expr = function
   | Noexpr -> ""
   | Fop(fop, e) -> (* let str = string_of_expr e in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
-        (match fop with 
-  			 Open -> "\ttry { \n\tUtility.getFile(" ^ string_of_expr e ^");\n" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
-  			 | Close -> "\tif (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
+        match fop with 
+  			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
+  			 | Close -> let s = tabs 0 ^"if (Utility.close(" ^ string_of_expr e ^ ")) \n\t"^tabs 0 ^"System.out.print(\"Close file successfully.\");\n\t} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
+                    in depth := depth.contents - 1; s^tabs 0^"\t\t}"
+                  
 
 let string_of_var = function
     (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";\n\t" else " = "^ string_of_expr e ^ ";\n")
        
-
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
   | Decl(str1, str2, expr) -> tabs 0 ^ string_of_var (str1, str2, expr)
@@ -145,6 +146,6 @@ let java_var_list = function
 
 let to_java (vars_t, funcs_t) name =
  	depth := 0; 
-	"import java.util.Scanner;\nimport java.io.*; \nimport java.io.IOException; \n\nclass "^ name ^ "{ \n" 
+	"import java.util.Scanner;\nimport java.io.FileWriter;\nimport java.io.File; \nimport java.io.IOException; \n\nclass "^ name ^ "{ \n" 
 	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t ^ "\n }" 
   
