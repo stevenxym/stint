@@ -4,9 +4,10 @@ void main()
 	open filename;
 	string str = "This is a sentence.";
 
-	if (PrintFile (str,filename))
+	if (printFile (str,filename))
 	{
 		std << str;
 	}
+	close filename;
 	return;
 }

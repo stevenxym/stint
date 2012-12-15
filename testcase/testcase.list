@@ -1,4 +1,4 @@
-25
+30
 test_type1
 test_type2
 test_op_append
@@ -21,6 +21,11 @@ test_while2
 test_arith1
 test_arith2
 test_func_add
+test_func_printfile
+test_func_readfile
+test_func_replace
+test_func_upper
+test_func_lower
 test_fib
 test_sp1
 test_sp2

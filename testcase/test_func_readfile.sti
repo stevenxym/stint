@@ -4,9 +4,11 @@ void main()
 	open filename;
 	string str;
 
-	while ((str = ReadFile(filename)) != eof)
+	while (filename >> str)
 	{
 		std << str;
 	}
+
+	close filename;
 	return;
 }

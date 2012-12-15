@@ -99,8 +99,7 @@ let rec string_of_expr = function
         match fop with 
   			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
   			 | Close -> let s = tabs 0 ^"Utility.close(" ^ string_of_expr e ^ ");\n"^tabs 0 ^"} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
-                    in depth := depth.contents - 1; s^tabs 0^"\t}"
-                  
+                    in depth := depth.contents - 1; s^tabs 0^"\t}" 
 
 let string_of_var = function
     (s1, s2, e) -> (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";\n\t" else " = "^ string_of_expr e ^ ";\n")
