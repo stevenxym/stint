@@ -61,6 +61,8 @@ public class Stint implements Cloneable{
 	}
 
 	public Stint addAt(Stint s, int index){
+		if(index<0)
+			index=0;
 		String s1=this.toString();
 		String s2=s.toString();
 		if(s1.length()<index || index<0){
@@ -168,7 +170,7 @@ public class Stint implements Cloneable{
 	public int getCount(Stint s){
 		chooser=s.toString();
 		spliter=null;
-		return this.toString().split(chooser).length;
+		return this.toString().endsWith(s.toString())?this.toString().split(chooser).length:this.toString().split(chooser).length-1;
 	}
 
 	public Stint removeInt(int index){
@@ -217,6 +219,37 @@ public class Stint implements Cloneable{
 
 	//a<index>=s
 	public void setByString(Stint s,int index){
+		if(chooser!=null){
+			if(this.getCount(new Stint(chooser))<=index)
+				exception("Stint: Invalid Index");
+			String s1=this.toString();
+			int j=-1;
+			for(int i=0;i<=index;i++){
+				j=s1.indexOf(chooser,j+1);
+			}
+			String s2=this.toString().substring(j);
+			s2=s2.replaceFirst(chooser,s.toString());
+			String f=this.toString().substring(0,j)+s2;
+			content=new StringBuilder();
+			content.append(f);
+			update();
+			return;
+		}
+		if(spliter!=null){
+			if(this.split(new Stint(spliter))<=index)
+				exception("Stint: Invalid Index");
+			String[] temp=this.toString().split(spliter);
+			temp[index]=s.toString();
+			content=new StringBuilder();
+			for(int k=0;k<temp.length;k++){
+				content.append(temp[k]);
+				if(k!=temp.length-1)
+					content.append(spliter);
+			}
+			
+			update();
+			return;
+		}
 		if(strings.size()==0){
 			exception("Stint: Invalid Index");
 		}
@@ -289,6 +322,16 @@ public class Stint implements Cloneable{
 		content=new StringBuilder();
 		content.append(temp);
 		update();
+	}
+	
+	/* Below are methods that are used to support build-in functions */
+	
+	public Stint getUpperCase(){
+		return new Stint(content.toString().toUpperCase());
+	}
+	
+	public Stint getoLowerCase(){
+		return new Stint(content.toString().toLowerCase());
 	}
 
 	/* Below are private methods for the maintaince of internal structure */

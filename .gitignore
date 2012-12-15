@@ -5,3 +5,4 @@
 /compiler/scanner.ml
 /compiler/*.cmo
 /compiler/*.cmi
+*.class

@@ -211,6 +211,22 @@ public class StintTester {
 				}
 			}
 			
+			log("******",false);
+			s=cases.get(8);
+			log(s.toString(),false);
+			int j=s.getCount(new Stint("2"));
+			log(j+"",false);
+			s.setByString(new Stint("@@"),0);
+			log(s.toString(),false);
+			
+			log("******",false);
+			s=cases.get(8);
+			log(s.toString(),false);
+			j=s.split(new Stint("32"));
+			log(j+"",false);
+			s.setByString(new Stint("**"),1);
+			log(s.toString(),false);
+			
 		}catch(Exception e){
 			log("@SET CHECK FAILED",true);
 			e.printStackTrace();
