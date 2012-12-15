@@ -195,10 +195,10 @@ and get_expr_with_type env expr t =
 let check_formal env formal = 
 	let (t, name, expr) = formal in
 	let ret = add_local name t env in
-	let env = {locals = ret; globals = env.globals; functions = env.functions } in
 	if t = "void" then raise (Failure("cannot use void as variable type")) else
 	if StringMap.is_empty ret then raise (Failure ("local variable " ^ name ^ " is already defined"))
-	else ( match expr with
+	else let env = {locals = ret; globals = env.globals; functions = env.functions } in
+	( match expr with
 		Noexpr -> (t, name, Sast.Noexpr), env
 		| _ -> raise(Failure("cannot assign value inside function definition")) )
 	(*let e = check_expr env expr i
@@ -211,7 +211,7 @@ let check_formal env formal =
 let rec check_formals env formals = 
 	match formals with 
 	  [] -> []
-	| hd::tl -> let f, e = (check_formal env hd) in f::(check_formals e tl) 
+	| hd::tl -> let f, e = (check_formal env hd) in (f, e)::(check_formals e tl) 
 
 
 let rec check_stmt env func = function
@@ -220,9 +220,10 @@ let rec check_stmt env func = function
 				(*modified: 1. check s1 cannot be void; 2. expr can be void*)
 							if s1 = "void" then raise (Failure("cannot use void as variable type")) else
 							if not(snd e = s1) && not(snd e = "void") && not(s1 = "string") then raise (Failure ("type error"))
-	        				else let ret = add_local s2 s1 env in let env = {locals = ret; globals = env.globals; functions = env.functions } in
+	        				else let ret = add_local s2 s1 env in 
 	        				if StringMap.is_empty ret then raise (Failure ("local variable " ^ s2 ^ " is already defined")) 
-	        				else if s1 = "string" && (snd e = "int" || snd e = "boolean") then (Sast.Decl(s1, s2, Sast.ToStr(fst e))), env 
+	        				else let env = {locals = ret; globals = env.globals; functions = env.functions } in
+	        				if s1 = "string" && (snd e = "int" || snd e = "boolean") then (Sast.Decl(s1, s2, Sast.ToStr(fst e))), env 
 							else (Sast.Decl(s1, s2, fst e)), env
 	| Expr(expr) -> (Sast.Expr(fst (check_expr env expr))), env
 	| Return(expr) -> let e = check_expr env expr in
@@ -245,21 +246,29 @@ and check_stmt_list env func = function
 let check_global env global =
 	let (v_type, name, expr) = global in
 	let ret = add_global name v_type env in
-	let env = {locals = env.locals; globals = ret; functions = env.functions } in
 	if StringMap.is_empty ret then raise (Failure ("global variable " ^ name ^ " is already defined"))
-	else (v_type, name, fst (check_expr env expr)), env
+	else let env = {locals = env.locals; globals = ret; functions = env.functions } in
+	(v_type, name, fst (check_expr env expr)), env
 
 let rec check_globals env globals = 
 	match globals with
 	  [] -> []
-	| hd::tl -> let g, e = (check_global env hd) in g::(check_globals e tl)
+	| hd::tl -> let g, e = (check_global env hd) in (g, e)::(check_globals e tl)
 
 let check_function env func =
 	let env = {locals = StringMap.empty; globals = env.globals; functions = env.functions } in
 	let ret = add_function func.fname func.returnType func.formals env in
-	let env = {locals = env.locals; globals = env.globals; functions = ret } in
 	if StringMap.is_empty ret then raise (Failure ("function " ^ func.fname ^ " is already defined"))
-	else {Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = (check_formals env func.formals); Sast.body = (check_stmt_list env func func.body)}, env
+	else let env = {locals = env.locals; globals = env.globals; functions = ret } in
+	let f = check_formals env func.formals in
+	let formals = List.map (fun formal -> fst formal) f in
+	match f with
+	[] -> let body = check_stmt_list env func func.body in
+		{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, env
+	| _ -> 	let e = snd (List.hd (List.rev f)) in
+		let body = check_stmt_list e func func.body in
+		{Sast.returnType = func.returnType; Sast.fname = func.fname; Sast.formals = formals; Sast.body = body}, e
+
 
 let rec check_functions env funcs = 
 	match funcs with
@@ -272,6 +281,12 @@ let check_program (globals, funcs) =
 			globals = StringMap.empty;
 			functions = StringMap.empty }
 	in
-	((check_globals env globals), (check_functions env funcs))
+	let g = check_globals env globals in
+	let globals = List.map (fun global -> fst global) g in
+	match g with
+	 [] -> (globals, (check_functions env (List.rev funcs)))
+	| _ -> let e = snd (List.hd (List.rev g)) in (globals, (check_functions e (List.rev funcs)))
+	
+	
 
 
