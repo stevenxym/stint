@@ -102,8 +102,8 @@ let rec string_of_expr = function
   			 | Close -> "if (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
 
 let string_of_var = function
-    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
-      else "Stint" ^" "^ s2 ^ " = " ^ string_of_expr e ^ ";\n")
+    (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";\n\t" else " = "^ string_of_expr e ^ ";\n")
+       
 
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
@@ -131,7 +131,7 @@ let string_of_formal_list = function
 
 let string_of_fdecl fdecl = tabs 0 ^
   (if fdecl.fname = "main" then "public static void main (String args[]) \n"
-    else (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
+    else "static" ^ (if fdecl.returnType = "int" || fdecl.returnType = "boolean" then fdecl.returnType else "Stint" )
           ^ " " ^ fdecl.fname ^ "(" ^ string_of_formal_list fdecl.formals ^ ")\n" 
     )
   	^ string_of_block  fdecl.body

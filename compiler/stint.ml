@@ -22,7 +22,7 @@ let _ =
         | "-j" -> if Array.length Sys.argv == 3 then Java else Help
         | "-c" -> if Array.length Sys.argv == 3 then Class else Help
         | "-v" -> Version
-        |   _  -> Help)
+        |   _  -> Help )
     else Help in
 
     match action with
