@@ -314,6 +314,7 @@ static void __run_java(char *name, char *out)
 	int pid;
 	int err = 0;
 	char *buff[3] = {"java", name, NULL};
+	int fd = 0;
 
 	//buff[0] = strdup("java");
 	//buff[1] = strdup(name);
@@ -330,16 +331,20 @@ static void __run_java(char *name, char *out)
 	if (pid != 0)
 		wait(NULL);
 	else {
-		int fd = open(out, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-		close(1);
-		dup(fd);
+		if (out) {
+			fd = open(out, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+			close(1);
+			dup(fd);
+		}
 		err = execv("/usr/bin/java", buff);
 		if (err < 0) {
 			perror("");
-			close(fd);
+			if (out)
+				close(fd);
 			exit(EXIT_FAILURE);
 		}
-		close(fd);
+		if (out)
+			close(fd);
 	}
 }
 

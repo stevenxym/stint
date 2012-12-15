@@ -1,0 +1,13 @@
+void main()
+{
+	string str;
+	open "data.txt";
+	open "data.out";
+	"data.out" << "please input something: \n";
+	std >> str;
+	"data.out" << "your input is: " + str +"\n";
+	close "data.txt";
+	close "data.out";
+
+	return;
+}
