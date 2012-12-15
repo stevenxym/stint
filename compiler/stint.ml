@@ -35,9 +35,12 @@ let _ =
       if not (suffix = ".sti") then raise (Failure ("Invalid type of source file.")) 
       else 
         let input = open_in fname in
+        let input2 = open_in "BuildinFunctions.sti" in
         let lexbuf = Lexing.from_channel input in
+        let lexbuf2= Lexing.from_channel input2 in
         let program = Parser.program Scanner.token lexbuf in
-        let program_t = Typecheck.check_program program in        
+        let program2 = Parser.program Scanner.token lexbuf2 in
+        let program_t = Typecheck.check_program (fst program, (snd program @ snd program2)) in        
         let lindex = ( if ( String.contains fname '/') then ((String.rindex fname '/') + 1) else 0 ) in
         let temp = String.capitalize (String.sub fname lindex ( index - lindex) ) in 
         let outfilename = temp ^".java" in
