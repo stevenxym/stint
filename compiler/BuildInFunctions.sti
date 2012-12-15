@@ -1,0 +1,82 @@
+string ReadFile(string filename){
+	open filename;
+	string s;
+	filename >> s;
+	return s;
+}
+
+boolean PrintFile(string s, string filename){
+	open filename;
+	filename << s;
+	return true;
+}
+
+string toUpperCase(string s){
+	replaceAll(s,"a","A");
+	replaceAll(s,"b","B");
+	replaceAll(s,"c","C");
+	replaceAll(s,"d","D");
+	replaceAll(s,"e","E");
+	replaceAll(s,"f","F");
+	replaceAll(s,"g","G");
+	replaceAll(s,"h","H");
+	replaceAll(s,"i","I");
+	replaceAll(s,"j","J");
+	replaceAll(s,"k","K");
+	replaceAll(s,"l","L");
+	replaceAll(s,"m","M");
+	replaceAll(s,"n","N");
+	replaceAll(s,"o","O");
+	replaceAll(s,"p","P");
+	replaceAll(s,"q","Q");
+	replaceAll(s,"r","R");
+	replaceAll(s,"s","S");
+	replaceAll(s,"t","T");
+	replaceAll(s,"u","U");
+	replaceAll(s,"v","V");
+	replaceAll(s,"w","W");
+	replaceAll(s,"x","X");
+	replaceAll(s,"y","Y");
+	replaceAll(s,"z","Z");
+	return s;
+}
+
+string toLowerCase(string s){
+	replaceAll(s,"A","a");
+	replaceAll(s,"B","b");
+	replaceAll(s,"C","c");
+	replaceAll(s,"D","d");
+	replaceAll(s,"E","e");
+	replaceAll(s,"F","f");
+	replaceAll(s,"G","g");
+	replaceAll(s,"H","h");
+	replaceAll(s,"I","i");
+	replaceAll(s,"J","j");
+	replaceAll(s,"K","k");
+	replaceAll(s,"L","l");
+	replaceAll(s,"M","m");
+	replaceAll(s,"N","n");
+	replaceAll(s,"O","o");
+	replaceAll(s,"P","p");
+	replaceAll(s,"Q","q");
+	replaceAll(s,"R","r");
+	replaceAll(s,"S","s");
+	replaceAll(s,"T","t");
+	replaceAll(s,"U","u");
+	replaceAll(s,"V","v");
+	replaceAll(s,"W","q");
+	replaceAll(s,"X","x");
+	replaceAll(s,"Y","y");
+	replaceAll(s,"Z","z");
+	return s;
+}
+
+string replaceAll(string dest, string d, string s){
+	int n=dest # d;
+	while(n>0){
+		dest<|i|>=s;
+		n=dest # d;
+	}
+	return dest;
+}
+
