@@ -1,9 +1,3 @@
-string readFile(string filename){
-	string s="";
-	filename >> s;
-	return s;
-}
-
 boolean printFile(string s, string filename){
 	open filename;
 	filename << s;
@@ -17,7 +11,7 @@ string replaceAll(string dest, string d, string s){
 		dest<|0|>=s;
 		n=dest # d;
 	}
-	return dest;
+s	return dest;
 }
 
 string toUpperCase(string s){
