@@ -1,0 +1,28 @@
+/* test basic operators and type conversion */
+
+void main ()
+{
+	int i = 0;	/* iter */
+	int base = 1;
+	string str = "abc123edf456gh";
+
+	while (i < 3) {
+
+		/* check math operator */
+		std << (base+1) + ", " + (base-1) + ", " + (base*2) + ", " + base/2 + "\n";
+
+		/* check string operator */
+		str.<|0|> = str.<|0|> + base;
+		str.<|1|> = str.<|1|> - base;
+		std << str + "\n";
+
+		base = base + 1;
+		i = i + 1;
+		std << "---\n";
+	}
+
+	/* test long output */
+	std << "result: str is " + str + ", base is " + base + ", iter is " + i + "\n";
+
+	return;
+}

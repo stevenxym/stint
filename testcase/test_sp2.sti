@@ -1,0 +1,23 @@
+/* test basic string extraction and dynamic indexing */
+
+void main ()
+{
+	string str = "abc123def456gh";
+
+	std << str<|0|> + ", " + str.<|0|> + "\n";
+	~str<|1|>;
+	std << str<|0|> + ", " + str.<|0|> + "\n";
+	~str.<|0|>;
+	std << str<|0|> + "\n";
+	std << str[0] + ", " + str[2, 2] + "\n";
+
+	/* add something into it, and test indexing again */
+	str = str + 9 @ 0;	/* add 9 in front of 9 */
+	str = str + 78 @ 4;
+	std << str + "\n";
+	std << str<|1|> + ", " + str.<|1|> + "\n";
+	str<|0|> = 2;
+	std << str + ", " + str.<|0|> + "\n";
+
+	return;
+}
