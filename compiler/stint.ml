@@ -30,15 +30,16 @@ let _ =
     | Version -> print_endline (version)
     | (Ast | Sast | Java | Class) ->
       let fname = Sys.argv.(2) in 
-      let index = String.rindex fname '.' in 
+      let index = (if String.contains fname '.' then String.rindex fname '.' else 0 ) in 
       let suffix = String.sub fname index 4 in
       if not (suffix = ".sti") then raise (Failure ("Invalid type of source file.")) 
       else 
         let input = open_in fname in
         let lexbuf = Lexing.from_channel input in
         let program = Parser.program Scanner.token lexbuf in
-        let program_t = Typecheck.check_program program in
-        let temp = String.capitalize (String.sub fname 0 ( index - 0) ) in 
+        let program_t = Typecheck.check_program program in        
+        let lindex = ( if ( String.contains fname '/') then ((String.rindex fname '/') + 1) else 0 ) in
+        let temp = String.capitalize (String.sub fname lindex ( index - lindex) ) in 
         let outfilename = temp ^".java" in
         if action = Ast then let listing = Ast.string_of_program program in print_string listing
         else
