@@ -283,7 +283,10 @@ let rec check_functions env funcs =
 
 
 let check_program (globals, funcs) = 
-	let env = {	locals = StringMap.empty;
+(* 	let ret = add_function "readFile" "string" [("string", _, _)] StringMap.empty in
+	let ret = add_function "printFile" "boolean" [("string", _, _); ("string", _, _)] ret in 
+	let ret = add_function "replaceAll" "string"  *)
+ 	let env = {	locals = StringMap.empty;
 			globals = StringMap.empty;
 			functions = StringMap.empty }
 	in
