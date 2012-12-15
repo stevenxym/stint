@@ -1,0 +1,8 @@
+void main()
+{
+  if (false) {
+  	std << 42;
+  	}
+  std << 17;
+  return;
+}

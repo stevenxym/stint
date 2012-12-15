@@ -1,0 +1,6 @@
+void main ()
+{
+	int num = 39 +3;
+	std << num;
+	return;
+}
