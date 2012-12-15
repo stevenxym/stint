@@ -1,7 +1,0 @@
-void main()
-{
-	string filename = "data.txt";
-	open filename;
-	close filename;
-	return;
-}
