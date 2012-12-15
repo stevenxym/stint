@@ -81,18 +81,15 @@ let rec string_of_expr = function
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
             In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "in = new Scanner (Utility.getFile(" ^ string_of_expr e1 ^ ")); \n
-                while (in_"^ temp ^".hasNextLine()) {\n
-                "^ string_of_expr e2 ^" = new Stint( in_"^ temp ^".nextLine());\n
-                System.out.println("^ string_of_expr e2 ^".toString());\n }"
-            | Out -> "pwriter = new PrintWriter(new FileWriter(Utility.getFile(" ^string_of_expr e1 ^ "));\n
-                      pwriter.print((" ^ string_of_expr e2 ^").toString())"
+                "in = Utility.getScanner(" ^ string_of_expr e1 ^ "); \n
+                while (in.hasNextLine()) {\n  "^ string_of_expr e2 ^" = new Stint(in.nextLine());\n System.out.println("^ string_of_expr e2 ^".toString());\n }"
+            | Out -> "pwriter = Utility.getWriter(" ^string_of_expr e1 ^ ");\n pwriter.print((" ^ string_of_expr e2 ^").toString())"
           )
-      )
+      
   | StreamStd(s, e) ->
       (match s with
-        In -> "Scanner in = new Scanner(System.in);\n " ^ string_of_expr e ^ " = new Stint( in.next() )"
-        | Out -> "System.out.print((" ^ string_of_expr e ^ ").toString())"
+        In -> "\tScanner in = new Scanner(System.in);\n\t" ^ string_of_expr e ^ " = new Stint( in.next() )"
+        | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -101,11 +98,8 @@ let rec string_of_expr = function
   | Fop(fop, e) -> (* let str = string_of_expr e in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
         (match fop with 
-  			 Open -> "try { \n 
-                  Scanner in = new Scanner(Utility.getFile(" ^ string_of_expr e ^"));\n 
-                  PrintWriter pwriter = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ ")))" 
-  			 | Close -> "in_" ^ temp ^ ".close();\n pwriter_" ^ temp ^ ".close();\n } \n 
-                    catch (Exception e) { \n System.err.println (e); }\n" ) 
+  			 Open -> "try { \n\tUtility.getFile(" ^ string_of_expr e ^");\n\tScanner in;\n\tPrintWriter pwriter;\n" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
+  			 | Close -> "if (Utility.close(" ^ string_of_expr e ^ ")) \n\tSystem.out.print(\"Close file successfully.\");\n\t} \n\tcatch (Exception e) { \n System.err.println (e); }\n" ) 
 
 let string_of_var = function
     (s1, s2, e) -> tabs 0 ^ (if s1 = "int" || s1 = "boolean" then s1 ^ " " ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
@@ -152,6 +146,6 @@ let java_var_list = function
 
 let to_java (vars_t, funcs_t) name =
  	depth := 0; 
-	"import java.util.Scanner;\n import java.io.*; \n import java.io.IOException; \n\n class "^ name ^ "{ \n" 
+	"import java.util.Scanner;\nimport java.io.*; \nimport java.io.IOException; \n\nclass "^ name ^ "{ \n" 
 	^ java_var_list vars_t ^ "\n" ^ java_func_list funcs_t ^ "\n }" 
   
