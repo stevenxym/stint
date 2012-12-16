@@ -162,9 +162,15 @@ public class Stint implements Cloneable{
 
 	//Function not Tested
 	public int split(Stint s){
-		spliter=s.toString();
-		chooser=null;
-		return this.toString().split(spliter).length;
+		if(s.equals("")){
+			spliter=null;
+			return -1;
+		}
+		else {
+			spliter=s.toString();
+			chooser=null;
+			return this.toString().split(spliter).length;
+		}
 	}
 
 	public int getCount(Stint s){
@@ -248,7 +254,7 @@ public class Stint implements Cloneable{
 				if(k!=temp.length-1)
 					content.append(spliter);
 			}
-			
+
 			update();
 			return;
 		}
@@ -327,13 +333,13 @@ public class Stint implements Cloneable{
 		content.append(temp);
 		update();
 	}
-	
+
 	/* Below are methods that are used to support build-in functions */
-	
+
 	public Stint getUpperCase(){
 		return new Stint(content.toString().toUpperCase());
 	}
-	
+
 	public Stint getoLowerCase(){
 		return new Stint(content.toString().toLowerCase());
 	}
