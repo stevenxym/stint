@@ -190,6 +190,7 @@ public class Stint implements Cloneable{
 				return this;
 			integers.remove(key);
 			reBuild();
+			update();
 			//			content=new StringBuilder();
 			//			content.append(key);
 			//			update();
