@@ -314,6 +314,7 @@ public class Stint implements Cloneable{
 		integers.remove(key);
 		integers.put(key,value);
 		reBuild();
+		update();
 	}
 
 	//a[start, length]=s
