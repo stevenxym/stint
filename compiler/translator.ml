@@ -80,24 +80,23 @@ let rec string_of_expr = function
      (* (let str = string_of_expr e1 in
           let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
           (match s with
-            In -> (* "Stint "^ string_of_expr e ^"=null;\n "*)
-                "\tif (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"}"
+            In -> "\tUtility.read("^ string_of_expr e1 ^", "^string_of_expr e2^")"
+                (*"\tif (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"}"*)
             | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").write((" ^ string_of_expr e2 ^").toString())"
           )
       
   | StreamStd(s, e) ->
       (match s with
-        In -> "\tScanner in = new Scanner(System.in);\n\t"^tabs 0 ^ string_of_expr e ^ " = new Stint( in.next() )"
+        In -> "Utility.read("^ string_of_expr e ^ ")"
         | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | ToStr(e) -> "new Stint(" ^ string_of_expr e ^ ")"
   | Noexpr -> ""
-  | Fop(fop, e) -> (* let str = string_of_expr e in
-          let temp = String.sub str 10 ((String.rindex str '.') - 10) in *)
+  | Fop(fop, e) -> 
         match fop with 
-  			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" (* = new PrintWriter(new FileWriter(Utility.getFile(" ^ string_of_expr e ^ "))) *)
+  			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" 
   			 | Close -> let s = tabs 0 ^"Utility.close(" ^ string_of_expr e ^ ");\n"^tabs 0 ^"} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
                     in depth := depth.contents - 1; s^tabs 0^"\t}" 
 

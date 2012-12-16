@@ -2,7 +2,7 @@ void main()
 {
 	string filename = "data.txt";
 	open filename;
-	string str;
+	string str = "";
 
 	while (filename >> str)
 	{
