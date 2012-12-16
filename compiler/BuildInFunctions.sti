@@ -11,7 +11,7 @@ string replaceAll(string dest, string d, string s){
 		dest<|0|>=s;
 		n=dest # d;
 	}
-s	return dest;
+	return dest;
 }
 
 string toUpperCase(string s){

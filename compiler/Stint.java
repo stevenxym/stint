@@ -214,6 +214,7 @@ public class Stint implements Cloneable{
 
 	public Stint removeString(int index){
 		this.setByString(new Stint(),index);
+		update();
 		return this;
 	}
 
