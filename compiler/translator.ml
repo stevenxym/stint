@@ -77,17 +77,14 @@ let rec string_of_expr = function
   		s ^ 
   		".removeRange(" ^ string_of_expr e1 ^", " ^ string_of_expr e2 ^")" 	
   | Stream(s, e1, e2) ->  
-     (* (let str = string_of_expr e1 in
-          let temp = String.sub str 10 ((String.rindex str '.') - 10) in  *)
-          (match s with
-            In -> "\tUtility.read("^ string_of_expr e1 ^", "^string_of_expr e2^")"
-                (*"\tif (Utility.getScanner(" ^ string_of_expr e1 ^ ").hasNextLine()) {\n\t"^tabs 0 ^ string_of_expr e2 ^" = new Stint(Utility.getScanner(" ^ string_of_expr e1 ^ ").nextLine());\n\t"^tabs 0 ^"}"*)
-            | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").write((" ^ string_of_expr e2 ^").toString())"
-          )
-      
+      (match s with
+          In -> "\tUtility.read("^ string_of_expr e1 ^", "^string_of_expr e2^")"
+          | Out -> "\tUtility.getWriter(" ^string_of_expr e1 ^ ").write((" ^ string_of_expr e2 ^").toString());\n"^tabs 0^
+          "\tUtility.getWriter(" ^string_of_expr e1 ^ ").flush()"
+      )   
   | StreamStd(s, e) ->
       (match s with
-        In -> "Utility.read("^ string_of_expr e ^ ")"
+        In -> "\tUtility.read("^ string_of_expr e ^ ")"
         | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
@@ -97,7 +94,7 @@ let rec string_of_expr = function
   | Fop(fop, e) -> 
         match fop with 
   			 Open -> depth := depth.contents + 1; "try { \n\t"^tabs 0 ^"Utility.getFile(" ^ string_of_expr e ^")" 
-  			 | Close -> let s = tabs 0 ^"Utility.close(" ^ string_of_expr e ^ ");\n"^tabs 0 ^"} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
+  			 | Close -> let s = "\n\t"^tabs 0 ^"Utility.close(" ^ string_of_expr e ^ ");\n"^tabs 0 ^"} \n"^tabs 0 ^"catch (Exception e) { \n\t"^tabs 0 ^"System.err.println (e);\n "
                     in depth := depth.contents - 1; s^tabs 0^"\t}" 
 
 let string_of_var = function

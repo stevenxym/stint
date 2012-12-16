@@ -53,7 +53,7 @@ var_type:
 		| STR { "string" }
 		| BOOL { "boolean"}
 		| VOID { "void" }
-		
+
 formals_opt:
 	/* nothing */ { [] }
 	| formal_list { List.rev $1 }
