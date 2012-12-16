@@ -224,6 +224,14 @@ public class Stint implements Cloneable{
 		update();
 		return this;
 	}
+	
+	public Stint removeAll(){
+		this.content=new StringBuilder("");
+		chooser=null;
+		spliter=null;
+		update();
+		return this;
+	}
 
 	//a<index>=s
 	public void setByString(Stint s,int index){
@@ -334,6 +342,11 @@ public class Stint implements Cloneable{
 		update();
 	}
 
+	public void setByStint(Stint s){
+		this.content=new StringBuilder(s.toString());
+		update();
+	}
+	
 	/* Below are methods that are used to support build-in functions */
 
 	public Stint getUpperCase(){

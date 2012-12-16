@@ -44,7 +44,8 @@ public class Utility {
 		try{
 			Scanner sc=getScanner(filename);
 			if(sc.hasNextLine()){
-				dest=new Stint(sc.nextLine());
+				dest.removeAll();
+				dest.setByStint(new Stint(sc.nextLine()));
 				return true;
 			}else
 				return false;
@@ -58,7 +59,8 @@ public class Utility {
 		try{
 			Scanner sc=new Scanner(System.in);
 			if(sc.hasNextLine()){
-				dest=new Stint(sc.nextLine());
+				dest.removeAll();
+				dest.setByStint(new Stint(sc.nextLine()));
 				return true;
 			}else
 				return false;
