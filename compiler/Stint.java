@@ -344,6 +344,8 @@ public class Stint implements Cloneable{
 
 	private void update(){
 		chooser=null;
+		integers.clear();
+		strings.clear();
 		String temp=content.toString();
 		if(temp.length()==0)
 			return;
