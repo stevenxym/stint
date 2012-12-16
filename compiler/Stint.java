@@ -269,6 +269,7 @@ public class Stint implements Cloneable{
 		strings.remove(key);
 		strings.put(key,s.toString());
 		reBuild();
+		update();
 	}
 
 	//a[index]=s
