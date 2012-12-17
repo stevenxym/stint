@@ -98,7 +98,8 @@ let rec string_of_expr = function
                     in depth := depth.contents - 1; s^tabs 0^"\t}" 
 
 let string_of_var = function
-    (s1, s2, e) -> (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 ^ (if e = Noexpr then ";\n\t" else " = "^ string_of_expr e ^ ";\n")
+    (s1, s2, e) -> (if s1 = "int" || s1 = "boolean" then s1 else "Stint" )^ " " ^ s2 
+    ^ (if not (e = Noexpr) then " = "^ string_of_expr e ^ ";\n" else (if s1 = "int" then "= 0;\n" else (if s1 = "boolean" then "= false;\n" else "=new Stint();\n") ))
        
 let rec string_of_stmt = function
     Block(stmts) -> string_of_block stmts
