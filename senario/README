@@ -1,0 +1,17 @@
+# Senario 1
+Here is a list for last month's computer sales' information(sn1_table.txt).
+The columns separated by white spaces are represented as:
+	<name> <price> <sales> <inventory>
+And ther's another file recorded a single number per line for the sale amount
+  in this month(sn1_input).
+Now, the program is required to update the information list and output the
+  new list to another file called "sn1_output.txt".
+The necessary output includes modify the number of sales and inventory
+  up to this month based on the number in "sn_input.txt". Calculate a new
+  column for the total amount of income according to sales and price
+  for each kind of computer, and append it to the end of line.
+Meanwhile, for those having total income larger than $300,000, mark "(BEST)"
+  at the end of computer name; for those lower than $60,000, mark "(OFFER)"
+  at the end of computer name, and reduce its price to half as special offer.
+
+* the tes program is written in sn1_test.sti

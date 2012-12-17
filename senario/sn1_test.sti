@@ -1,0 +1,49 @@
+void main ()
+{
+	string input_file = "sn1_table.txt";
+	string data_file = "sn1_input.txt";
+	string output_file = "sn1_output.txt";
+
+	string in_buff = "";
+	string data_buff = "";
+	int sales;
+
+	/* open input and output files */
+	open input_file;
+	open data_file;
+	open output_file;
+
+	/* read line by line */
+	while (input_file >> in_buff) {
+
+		/* read sales of this month */
+		data_file >> data_buff;
+		sales = data_buff.<|0|>;	/* string -> int */
+
+		/* modify sales and inventory */
+		in_buff.<|1|> = in_buff.<|1|> + sales;
+		in_buff.<|2|> = in_buff.<|2|> - sales;
+
+		/* calculate total sale income */
+		in_buff = in_buff + " " + (in_buff.<|0|> * in_buff.<|1|>);
+
+		/* mark tag if necessary */
+		in_buff | " ";
+		if (in_buff.<|3|> > 300000) {
+			in_buff<|0|> = in_buff<|0|> + "(BEST)"; }
+
+		if (in_buff.<|3|> < 100000) {
+			in_buff<|0|> = in_buff<|0|> + "(OFFER)";
+			in_buff.<|0|> = in_buff.<|0|> / 2;
+		}
+
+		/* output */
+		output_file << in_buff + "\n";
+	}
+
+	close input_file;
+	close data_file;
+	close output_file;
+
+	return;
+}
