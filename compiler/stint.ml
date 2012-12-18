@@ -12,7 +12,7 @@ let usage =
     "        -j file.sti       (Compile source code to .java file)\n" ^
     "        -c file.sti       (Compile source code to .java and .class files)\n" ^
     "        -help             (Print a synopsis of standard options )\n" ^
-    "        -version          (Display version information)\n"
+    "        -v                (Display version information)\n"
 let _ =
   let action = 
     if Array.length Sys.argv > 1 then
