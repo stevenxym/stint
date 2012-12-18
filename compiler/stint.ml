@@ -3,7 +3,7 @@ open Unix
 type action = Ast | Sast | Java | Class | Help | Version
 
 let version =
-  "Stint version 1.0 \"12/18/12\" \n "
+  "Stint version 0.1 \"12/18/12\" \n "
 
 let usage =
   "Usage: ./stint <option> <source file>\n where possible options include: \n" ^
