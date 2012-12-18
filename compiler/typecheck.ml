@@ -245,10 +245,13 @@ and check_stmt_list env func = function
 
 let check_global env global =
 	let (v_type, name, expr) = global in
-	let ret = add_global name v_type env in
+	let e = check_expr env expr in 
+	if v_type = "void" then raise (Failure("cannot use void as variable type")) else
+	if not(snd e = v_type) && not(snd e = "void") && not(v_type = "string") then raise (Failure ("type error"))
+	else let ret = add_global name v_type env in
 	if StringMap.is_empty ret then raise (Failure ("global variable " ^ name ^ " is already defined"))
 	else let env = {locals = env.locals; globals = ret; functions = env.functions } in
-	(v_type, name, fst (check_expr env expr)), env
+	(v_type, name, fst e), env
 
 let rec check_globals env globals = 
 	match globals with
@@ -257,6 +260,10 @@ let rec check_globals env globals =
 
 let check_function env func =
 	if List.length func.body = 0 then raise (Failure ("The last statement must be return statement"))
+	else if func.fname = "main" && (List.length func.formals) > 0 
+	then raise (Failure ("The main function cannot take any argument"))
+	else if  func.fname = "main" && ((func.returnType = "int") || (func.returnType = "boolean"))
+	then raise (Failure ("The main function cannot can only has type void"))
 	else 
 	match List.hd (List.rev func.body) with
 	  Return(_) ->
