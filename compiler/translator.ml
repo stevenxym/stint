@@ -84,8 +84,8 @@ let rec string_of_expr = function
       )   
   | StreamStd(s, e) ->
       (match s with
-        In -> "\tUtility.read("^ string_of_expr e ^ ")"
-        | Out -> "\tSystem.out.print((" ^ string_of_expr e ^ ").toString())"
+        In -> "Utility.read("^ string_of_expr e ^ ")"
+        | Out -> "System.out.print((" ^ string_of_expr e ^ ").toString())"
       )  
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
